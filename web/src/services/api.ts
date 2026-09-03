@@ -34,6 +34,27 @@ export async function getConfig(options?: { channel?: string; uid?: string | num
   return result.data
 }
 
+export interface TokenResponse {
+  rtcToken: string
+  rtmToken: string
+  channel: string
+  uid: string
+  app_id: string
+}
+
+export async function getToken(options?: { channel?: string; uid?: string | number }): Promise<TokenResponse> {
+  const response = await fetch(`${API_BASE_URL}/token`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ channel: options?.channel, uid: options?.uid ? Number(options.uid) : undefined }),
+  })
+  if (!response.ok) {
+    const error = await response.json()
+    throw new Error(error.detail || `HTTP ${response.status}`)
+  }
+  return response.json()
+}
+
 export async function startAgent(channelName: string, rtcUid: number, userUid: number): Promise<string> {
   const payload = { channelName, rtcUid, userUid }
 
