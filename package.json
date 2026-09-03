@@ -1,0 +1,28 @@
+{
+  "name": "weathergpt",
+  "version": "0.2.0",
+  "private": true,
+  "description": "WeatherGPT — Voice-native IMD assistant via Agora Conversational AI Engine",
+  "type": "module",
+  "scripts": {
+    "dev": "bun run --filter '*' dev",
+    "setup": "bun install && pip install -r requirements.txt",
+    "doctor": "agora project doctor",
+    "lint": "echo \"lint placeholder\"",
+    "test": "pytest -v"
+  },
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "devDependencies": {
+    "agora-token": "^2.0.0"
+  },
+  "dependencies": {
+    "agora-agents": "^2.0.0"
+  },
+  "engines": {
+    "node": ">=18",
+    "bun": ">=1.0.0"
+  }
+}
