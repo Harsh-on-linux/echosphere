@@ -1,0 +1,19 @@
+{
+  "status": "success",
+  "message": "Fishermen Warning — Nagapattinam (Mock)",
+  "totalCount": 1,
+  "source": "IMD api.imd.gov.in/api/v1/fishermenwarning",
+  "cached_at": "2026-09-03T10:00:00Z",
+  "data": [
+    {
+      "district_id": "468",
+      "district_name": "Nagapattinam",
+      "warning": "Fishermen are advised not to venture into sea along and off Tamil Nadu coast on 2026-09-04 and 2026-09-05 due to strong winds 45-55 kmph gusting to 65 kmph.",
+      "sea_condition": "Rough to very rough",
+      "wind_speed": "45-55 kmph gusting 65 kmph",
+      "valid_from": "2026-09-04T05:30:00Z",
+      "valid_to": "2026-09-05T17:30:00Z",
+      "color_code": "Red"
+    }
+  ]
+}

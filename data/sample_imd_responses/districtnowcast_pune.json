@@ -1,0 +1,17 @@
+{
+  "status": "success",
+  "message": "District-wise Nowcast — Pune (Mock)",
+  "totalCount": 1,
+  "source": "IMD api.imd.gov.in/api/v1/districtnowcast",
+  "cached_at": "2026-09-03T10:00:00Z",
+  "data": [
+    {
+      "district_id": "528",
+      "district_name": "Pune",
+      "nowcast": "Light rain and cloudy sky for next 3 hours",
+      "issued_at": "2026-09-03T08:30:00Z",
+      "valid_till": "2026-09-03T11:30:00Z",
+      "warning": "No warning"
+    }
+  ]
+}

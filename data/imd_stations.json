@@ -1,0 +1,26 @@
+[
+  {
+    "station_id": "43063",
+    "station_name": "Pune",
+    "district_id": "528",
+    "lat": 18.5204,
+    "lon": 73.8567,
+    "type": "AWS"
+  },
+  {
+    "station_id": "43003",
+    "station_name": "Mumbai Santacruz",
+    "district_id": "533",
+    "lat": 19.0896,
+    "lon": 72.8656,
+    "type": "AWS"
+  },
+  {
+    "station_id": "43359",
+    "station_name": "Rameswaram",
+    "district_id": "453",
+    "lat": 9.2876,
+    "lon": 79.3129,
+    "type": "AWS"
+  }
+]

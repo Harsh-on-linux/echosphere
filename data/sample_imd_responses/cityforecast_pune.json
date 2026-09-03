@@ -1,0 +1,23 @@
+{
+  "status": "success",
+  "message": "City Weather Forecast (7 Days) — Pune (Mock, TTL 300s)",
+  "totalCount": 1,
+  "source": "IMD api.imd.gov.in/api/v1/cityforecast",
+  "cached_at": "2026-09-03T10:00:00Z",
+  "data": [
+    {
+      "district_id": "528",
+      "district_name": "Pune",
+      "state": "Maharashtra",
+      "forecast": [
+        {"date": "2026-09-04", "max_temp": 28, "min_temp": 21, "rainfall": "Light Rain", "rainfall_mm": 4.2, "humidity": 78, "wind_speed": 10, "weather": "Cloudy with light rain"},
+        {"date": "2026-09-05", "max_temp": 27, "min_temp": 20, "rainfall": "Moderate Rain", "rainfall_mm": 12.5, "humidity": 82, "wind_speed": 14, "weather": "Moderate rain"},
+        {"date": "2026-09-06", "max_temp": 29, "min_temp": 21, "rainfall": "No Rain", "rainfall_mm": 0, "humidity": 65, "wind_speed": 8, "weather": "Partly cloudy"},
+        {"date": "2026-09-07", "max_temp": 30, "min_temp": 22, "rainfall": "No Rain", "rainfall_mm": 0, "humidity": 60, "wind_speed": 6, "weather": "Sunny"},
+        {"date": "2026-09-08", "max_temp": 28, "min_temp": 21, "rainfall": "Light Rain", "rainfall_mm": 3.1, "humidity": 75, "wind_speed": 9, "weather": "Light rain"},
+        {"date": "2026-09-09", "max_temp": 27, "min_temp": 20, "rainfall": "Light Rain", "rainfall_mm": 5.0, "humidity": 80, "wind_speed": 11, "weather": "Cloudy"},
+        {"date": "2026-09-10", "max_temp": 26, "min_temp": 20, "rainfall": "Moderate Rain", "rainfall_mm": 15.2, "humidity": 85, "wind_speed": 16, "weather": "Heavy rain expected"}
+      ]
+    }
+  ]
+}

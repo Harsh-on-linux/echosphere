@@ -1,0 +1,112 @@
+[
+  {
+    "district_id": "528",
+    "district_name": "Pune",
+    "state": "Maharashtra",
+    "state_code": "MH",
+    "coastal": false,
+    "lat": 18.5204,
+    "lon": 73.8567,
+    "imd_station_id": "43063",
+    "aliases": ["Puna", "Poona", "पुणे"]
+  },
+  {
+    "district_id": "533",
+    "district_name": "Mumbai City",
+    "state": "Maharashtra",
+    "state_code": "MH",
+    "coastal": true,
+    "lat": 19.076,
+    "lon": 72.8777,
+    "imd_station_id": "43003",
+    "aliases": ["Bombay", "Mumbai", "मुंबई"]
+  },
+  {
+    "district_id": "534",
+    "district_name": "Mumbai Suburban",
+    "state": "Maharashtra",
+    "state_code": "MH",
+    "coastal": true,
+    "lat": 19.2173,
+    "lon": 72.8479,
+    "imd_station_id": "43004",
+    "aliases": ["Andheri", "Bandra"]
+  },
+  {
+    "district_id": "535",
+    "district_name": "Thane",
+    "state": "Maharashtra",
+    "state_code": "MH",
+    "coastal": true,
+    "lat": 19.2183,
+    "lon": 72.9781,
+    "imd_station_id": "43005",
+    "aliases": ["Thana", "Thane Creek"]
+  },
+  {
+    "district_id": "441",
+    "district_name": "Chennai",
+    "state": "Tamil Nadu",
+    "state_code": "TN",
+    "coastal": true,
+    "lat": 13.0827,
+    "lon": 80.2707,
+    "imd_station_id": "43279",
+    "aliases": ["Madras", "Chennai area", "சென்னை"]
+  },
+  {
+    "district_id": "468",
+    "district_name": "Nagapattinam",
+    "state": "Tamil Nadu",
+    "state_code": "TN",
+    "coastal": true,
+    "lat": 10.7656,
+    "lon": 79.8436,
+    "imd_station_id": "43346",
+    "aliases": ["Nagapatinam", "Nagai"]
+  },
+  {
+    "district_id": "453",
+    "district_name": "Rameswaram",
+    "state": "Tamil Nadu",
+    "state_code": "TN",
+    "coastal": true,
+    "lat": 9.2876,
+    "lon": 79.3129,
+    "imd_station_id": "43359",
+    "aliases": ["Rameshwaram", "Pamban"]
+  },
+  {
+    "district_id": "629",
+    "district_name": "Nagpur",
+    "state": "Maharashtra",
+    "state_code": "MH",
+    "coastal": false,
+    "lat": 21.1458,
+    "lon": 79.0882,
+    "imd_station_id": "42867",
+    "aliases": ["Nagapore", "नागपूर"]
+  },
+  {
+    "district_id": "123",
+    "district_name": "Puri",
+    "state": "Odisha",
+    "state_code": "OD",
+    "coastal": true,
+    "lat": 19.8135,
+    "lon": 85.8312,
+    "imd_station_id": "42976",
+    "aliases": ["Jagannath Puri"]
+  },
+  {
+    "district_id": "211",
+    "district_name": "Thanjavur",
+    "state": "Tamil Nadu",
+    "state_code": "TN",
+    "coastal": false,
+    "lat": 10.787,
+    "lon": 79.1378,
+    "imd_station_id": "43330",
+    "aliases": ["Tanjore", "Thanjai"]
+  }
+]
