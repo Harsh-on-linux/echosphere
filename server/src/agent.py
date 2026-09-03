@@ -12,16 +12,24 @@ from agora_agent import Area, AsyncAgora
 from agora_agent.agentkit import Agent as AgoraAgent
 from agora_agent.agentkit.vendors import DeepgramSTT, MiniMaxTTS, OpenAI
 
+try:
+    from persona_prompt import GREETINGS, WEATHERGPT_SYSTEM
+except ImportError:  # pragma: no cover - fallback when run from a different cwd
+    from src.persona_prompt import GREETINGS, WEATHERGPT_SYSTEM  # type: ignore
+
 logger = logging.getLogger("uvicorn.error")
 
-ADA_PROMPT = """You are Ada, an agentic developer advocate from Agora. You help developers understand and build with Agora's Conversational AI platform.
-
-Agora is a real-time communications company. The product you represent is the Agora Conversational AI Engine.
-
-If you do not know a specific fact about Agora, say so plainly and suggest checking docs.agora.io. Keep most replies to one or two sentences unless the user explicitly asks for more detail.
-"""
-
-DEFAULT_GREETING = "Hi there! I'm Ada, your virtual assistant from Agora. How can I help?"
+# Phase 2.1 — WeatherGPT managed voice loop (plan.md 2.1, research.md #5).
+# Agora is central: ASR->LLM->TTS runs in the Conversational AI Engine.
+# Free-tier first: managed Deepgram + gpt-4o-mini + MiniMax (no BYOK keys).
+WEATHERGPT_GREETING = GREETINGS["en-IN"]
+WEATHERGPT_FAILURE = (
+    "IMD data is busy right now. Last update was a few minutes ago. "
+    "Please try again in a moment."
+)
+WEATHERGPT_MAX_HISTORY = 10
+# Free-tier guard: auto-leave after 2 min silence (plan.md 2.1/2.3, AGENTS.md #5).
+WEATHERGPT_IDLE_TIMEOUT = 120
 
 
 class Agent:
@@ -35,7 +43,8 @@ class Agent:
     def __init__(self):
         self.app_id = os.getenv("AGORA_APP_ID")
         self.app_certificate = os.getenv("AGORA_APP_CERTIFICATE")
-        self.greeting = DEFAULT_GREETING
+        self.greeting = WEATHERGPT_GREETING
+        self.failure_message = WEATHERGPT_FAILURE
 
         if not self.app_id or not self.app_certificate:
             raise ValueError("AGORA_APP_ID and AGORA_APP_CERTIFICATE are required")
@@ -64,12 +73,14 @@ class Agent:
         if user_uid <= 0:
             raise ValueError("user_uid is required and cannot be empty")
 
-        # Default managed path: DeepgramSTT + OpenAI + MiniMaxTTS.
+        # Default managed path: DeepgramSTT + OpenAI + MiniMaxTTS (plan.md 2.1).
+        # Managed = included in the $0.10/min Conv AI price, inside 300 free mins.
         llm = OpenAI(
             model="gpt-4o-mini",
+            system_messages=[{"role": "system", "content": WEATHERGPT_SYSTEM}],
             greeting_message=self.greeting,
-            failure_message="Please wait a moment.",
-            max_history=15,
+            failure_message=self.failure_message,
+            max_history=WEATHERGPT_MAX_HISTORY,
             max_tokens=1024,
             temperature=0.7,
             top_p=0.95,
@@ -111,11 +122,13 @@ class Agent:
 
         agora_agent = AgoraAgent(
             client=self.client,
-            instructions=ADA_PROMPT,
+            instructions=WEATHERGPT_SYSTEM,
             greeting=self.greeting,
-            failure_message="Please wait a moment.",
-            max_history=50,
+            failure_message=self.failure_message,
+            max_history=WEATHERGPT_MAX_HISTORY,
             turn_detection={
+                "language": "en-US",
+                "mode": "default",
                 "config": {
                     "speech_threshold": 0.5,
                     "start_of_speech": {
@@ -133,6 +146,7 @@ class Agent:
                     },
                 },
             },
+            interruption={"enable": True, "mode": "start_of_speech"},
             advanced_features={"enable_rtm": True, "enable_tools": True},
             parameters=parameters,
         )
@@ -149,8 +163,9 @@ class Agent:
             agent_uid=str(agent_uid),
             remote_uids=[str(user_uid)],
             enable_string_uid=False,
-            idle_timeout=30,
+            idle_timeout=WEATHERGPT_IDLE_TIMEOUT,
             expires_in=3600,
+            name=f"wx-{int(time.time())}",
         )
 
         logger.info(
@@ -209,3 +224,41 @@ class Agent:
 
         logger.info("Stopping Agora agent through client.stop_agent agent_id=%s", agent_id)
         await self.client.stop_agent(agent_id)
+
+    async def interrupt(self, agent_id: str) -> None:
+        """Manually interrupt a speaking/thinking agent (plan.md 2.2 InterruptButton)."""
+        if not agent_id or not str(agent_id).strip():
+            raise ValueError("agent_id is required and cannot be empty")
+        session = self._sessions.get(agent_id)
+        if session is None:
+            raise ValueError(f"unknown agent_id: {agent_id}")
+        await session.interrupt()
+        logger.info("Interrupted Agora agent agent_id=%s", agent_id)
+
+    async def get_history(self, agent_id: str) -> Any:
+        """Return conversation history for verification (plan.md 2.1: check turns)."""
+        if not agent_id or not str(agent_id).strip():
+            raise ValueError("agent_id is required and cannot be empty")
+        session = self._sessions.get(agent_id)
+        if session is None:
+            raise ValueError(f"unknown agent_id: {agent_id}")
+        return await session.get_history()
+
+    async def get_turns(
+        self,
+        agent_id: str,
+        page_index: Optional[int] = None,
+        page_size: Optional[int] = None,
+    ) -> Any:
+        """Return per-turn latency metrics (plan.md 2.1: target <1s ASR+LLM+TTS)."""
+        if not agent_id or not str(agent_id).strip():
+            raise ValueError("agent_id is required and cannot be empty")
+        session = self._sessions.get(agent_id)
+        if session is None:
+            raise ValueError(f"unknown agent_id: {agent_id}")
+        kwargs: Dict[str, Any] = {}
+        if page_index is not None:
+            kwargs["page_index"] = page_index
+        if page_size is not None:
+            kwargs["page_size"] = page_size
+        return await session.get_turns(**kwargs)

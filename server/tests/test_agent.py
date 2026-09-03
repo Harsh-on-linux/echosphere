@@ -65,6 +65,98 @@ def test_start_wires_managed_openai_and_returns_shape(fake_env, monkeypatch):
     assert captured["remote_uids"] == ["222"]
 
 
+def test_start_wires_weathergpt_voice_loop(fake_env, monkeypatch):
+    """Phase 2.1: WeatherGPT prompt, greeting, idle_timeout 120, interruption."""
+    agent = _fresh_agent_module()
+    captured = {}
+
+    class FakeSession:
+        async def start(self):
+            return "test-agent-id"
+
+        async def stop(self):
+            captured["stopped"] = True
+
+    def fake_create_async_session(self, **kwargs):
+        captured["config"] = self.config
+        captured["idle_timeout"] = kwargs.get("idle_timeout")
+        captured["name"] = kwargs.get("name")
+        captured["channel"] = kwargs.get("channel")
+        captured["remote_uids"] = kwargs.get("remote_uids")
+        return FakeSession()
+
+    from agora_agent.agentkit import Agent as AgoraAgent
+
+    monkeypatch.setattr(AgoraAgent, "create_async_session", fake_create_async_session)
+
+    instance = agent.Agent()
+    result = asyncio.run(instance.start(channel_name="ch", agent_uid=111, user_uid=222))
+
+    assert result["agent_id"] == "test-agent-id"
+    config = captured["config"]
+    # WeatherGPT identity (not the Ada quickstart default)
+    assert "WeatherGPT" in (config["instructions"] or "")
+    assert "IMD" in (config["instructions"] or "")
+    assert config["greeting"] == agent.WEATHERGPT_GREETING
+    assert "IMD" in (config["failure_message"] or "")
+    assert config["max_history"] == 10
+    # Managed English loop: turn_detection en-US + voice interruption on
+    turn_detection = config["turn_detection"]
+    language = turn_detection.get("language") if isinstance(turn_detection, dict) else getattr(turn_detection, "language", None)
+    assert language == "en-US"
+    interruption = config["interruption"]
+    enabled = interruption.get("enable") if isinstance(interruption, dict) else getattr(interruption, "enable", None)
+    assert enabled is True
+    # Free-tier guard: 2 min idle timeout, wx- session names
+    assert captured["idle_timeout"] == 120
+    assert str(captured["name"]).startswith("wx-")
+
+
+def test_interrupt_history_turns_passthrough(fake_env, monkeypatch):
+    """Phase 2.2/2.3: interrupt + history/turns reach the active session."""
+    agent = _fresh_agent_module()
+
+    class FakeSession:
+        def __init__(self):
+            self.calls = []
+
+        async def start(self):
+            return "agent-abc"
+
+        async def stop(self):
+            pass
+
+        async def interrupt(self):
+            self.calls.append("interrupt")
+
+        async def get_history(self):
+            self.calls.append("history")
+            return {"contents": []}
+
+        async def get_turns(self, **kwargs):
+            self.calls.append(("turns", kwargs))
+            return {"turns": []}
+
+    session = FakeSession()
+    from agora_agent.agentkit import Agent as AgoraAgent
+
+    monkeypatch.setattr(AgoraAgent, "create_async_session", lambda self, **k: session)
+    instance = agent.Agent()
+    asyncio.run(instance.start(channel_name="ch", agent_uid=111, user_uid=222))
+
+    asyncio.run(instance.interrupt("agent-abc"))
+    assert "interrupt" in session.calls
+    assert asyncio.run(instance.get_history("agent-abc")) == {"contents": []}
+    assert asyncio.run(instance.get_turns("agent-abc", page_index=1)) == {"turns": []}
+
+    with pytest.raises(ValueError):
+        asyncio.run(instance.interrupt("unknown-id"))
+    with pytest.raises(ValueError):
+        asyncio.run(instance.get_history("unknown-id"))
+    with pytest.raises(ValueError):
+        asyncio.run(instance.get_turns("unknown-id"))
+
+
 def test_start_validates_arguments(fake_env, monkeypatch):
     agent = _fresh_agent_module()
     from agora_agent.agentkit import Agent as AgoraAgent
