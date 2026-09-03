@@ -1,0 +1,56 @@
+# Secrets — never commit (AGENTS.md #3.6)
+.env
+.env.local
+*.pem
+*.key
+customer_secret
+app_certificate
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.venv/
+venv/
+env/
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Node / Frontend
+node_modules/
+.next/
+out/
+dist/
+build/
+.turbo/
+bun.lockb
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Large binaries (AGENTS.md #3.6)
+*.wav
+*.mp3
+*.mp4
+!data/sample_imd_responses/*.json
+
+# OS
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.opencode/
+
+# Agora / CLI
+.agora/
