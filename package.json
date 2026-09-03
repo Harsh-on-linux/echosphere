@@ -1,28 +1,40 @@
 {
   "name": "weathergpt",
-  "version": "0.2.0",
+  "version": "0.3.0",
+  "description": "WeatherGPT — Voice-native IMD assistant via Agora Conversational AI Engine (farmer/fisherman/disaster)",
   "private": true,
-  "description": "WeatherGPT — Voice-native IMD assistant via Agora Conversational AI Engine",
-  "type": "module",
-  "scripts": {
-    "dev": "bun run --filter '*' dev",
-    "setup": "bun install && pip install -r requirements.txt",
-    "doctor": "agora project doctor",
-    "lint": "echo \"lint placeholder\"",
-    "test": "pytest -v"
-  },
   "workspaces": [
-    "frontend",
-    "backend"
+    "web"
   ],
+  "scripts": {
+    "dev": "bun run dev:check && concurrently -n backend,frontend -c blue,green \"bun run dev:backend\" \"bun run dev:frontend\"",
+    "dev:check": "bun run setup:env && bun run setup:deps",
+    "dev:backend": "cd server && bash -c '(venv/bin/python -m pip --version >/dev/null 2>&1 || (rm -rf venv && python3 -m venv venv)) && source venv/bin/activate && python -m pip install -q -r requirements.txt && python src/server.py'",
+    "dev:frontend": "cd web && AGENT_BACKEND_URL=http://localhost:8000 bun run dev",
+    "backend": "cd server && source venv/bin/activate && python src/server.py",
+    "frontend": "cd web && AGENT_BACKEND_URL=http://localhost:8000 bun run dev",
+    "setup": "bun run setup:env && bun run setup:backend && bun run setup:frontend && bun run setup:done",
+    "setup:env": "bash scripts/setup-server-env.sh prepare",
+    "setup:deps": "test -d node_modules || (echo 'Installing workspace dependencies...' && bun install)",
+    "setup:backend": "cd server && rm -rf venv && python3 -m venv venv && source venv/bin/activate && python -m pip install --upgrade pip && PIP_INDEX_URL=https://pypi.org/simple python -m pip install -r requirements.txt",
+    "setup:frontend": "bun install",
+    "setup:done": "bash scripts/setup-server-env.sh next-steps 'bun run doctor:local' 'bun run dev'",
+    "doctor": "bash -c 'set -e; echo \"Checking shared repo prerequisites...\"; command -v bun >/dev/null && echo \"- bun available\" || { echo \"- bun not found\"; exit 1; }; test -d node_modules && echo \"- workspace dependencies installed\" || { echo \"- root node_modules missing; run bun install\"; exit 1; }'",
+    "doctor:local": "bash -c 'set -e; bun run doctor; command -v python3 >/dev/null && echo \"- python3 available\" || { echo \"- python3 not found\"; exit 1; }; bash scripts/setup-server-env.sh prepare; bash scripts/setup-server-env.sh check'",
+    "build": "cd web && bun run build",
+    "verify": "bun run verify:web",
+    "verify:local": "bun run doctor:local && bun run verify:backend && bun run verify:local:fastapi && bun run verify:web:proxy && bun run verify:web:build",
+    "verify:local:fastapi": "cd web && bun run scripts/verify-local-fastapi.ts",
+    "verify:backend": "cd server && python3 -m py_compile src/server.py src/agent.py",
+    "verify:web": "bun run doctor && bun run verify:web:api && bun run verify:web:build",
+    "verify:web:api": "cd web && bun run scripts/verify-api-contracts.ts",
+    "verify:web:proxy": "cd web && bun run scripts/verify-local-proxy.ts",
+    "verify:web:build": "cd web && bun run build",
+    "clean": "bun run clean:backend && bun run clean:frontend",
+    "clean:backend": "rm -rf server/venv server/__pycache__ server/src/__pycache__",
+    "clean:frontend": "rm -rf node_modules web/node_modules web/.next web/dist"
+  },
   "devDependencies": {
-    "agora-token": "^2.0.0"
-  },
-  "dependencies": {
-    "agora-agents": "^2.0.0"
-  },
-  "engines": {
-    "node": ">=18",
-    "bun": ">=1.0.0"
+    "concurrently": "^8.2.2"
   }
 }
