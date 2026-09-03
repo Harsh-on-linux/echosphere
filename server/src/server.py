@@ -24,6 +24,14 @@ from pydantic import BaseModel
 from agora_agent.agentkit.token import generate_convo_ai_token
 from agent import Agent
 
+# WeatherGPT additions (Phase 1.2)
+try:
+    import imd_client  # noqa: F401
+    import location_resolver  # noqa: F401
+except Exception:
+    imd_client = None
+    location_resolver = None
+
 logger = logging.getLogger("uvicorn.error")
 
 
@@ -87,6 +95,55 @@ class StartAgentRequest(BaseModel):
 class StopAgentRequest(BaseModel):
     """Request body for POST /stopAgent"""
     agentId: str
+
+
+class TokenRequest(BaseModel):
+    """Request body for POST /api/token (plan.md 1.3)"""
+    channel: Optional[str] = None
+    uid: Optional[int] = None
+
+
+# --- Health & Token (Phase 1.2/1.3) ---
+
+@router.get("/health")
+async def health():
+    """Health check for WeatherGPT + Agora readiness"""
+    info = {}
+    if imd_client is not None:
+        try:
+            info = imd_client.cache_info()  # type: ignore
+        except Exception:
+            info = {"cache": "unknown"}
+    return {
+        "status": "ok",
+        "service": "weathergpt",
+        "version": "1.2.0",
+        "agora_configured": agent is not None,
+        "imd_cache": info,
+    }
+
+
+@router.post("/api/token")
+async def api_token(request: TokenRequest):
+    """POST /api/token {channel, uid} -> {rtcToken, rtmToken} alias for /get_config (plan.md 1.3)"""
+    if agent is None:
+        raise HTTPException(status_code=500, detail="Service not properly configured.")
+    try:
+        user_uid = random.randint(1000, 9999999) if request.uid is None or request.uid <= 0 else request.uid
+        channel_name = request.channel or _generate_channel_name()
+        app_id = os.getenv("AGORA_APP_ID")
+        app_certificate = os.getenv("AGORA_APP_CERTIFICATE")
+        token = generate_convo_ai_token(
+            app_id=app_id,
+            app_certificate=app_certificate,
+            channel_name=channel_name,
+            uid=user_uid,
+            token_expire=3600,
+        )
+        return {"rtcToken": token, "rtmToken": token, "channel": channel_name, "uid": str(user_uid), "app_id": app_id}
+    except Exception as e:
+        _log_route_error("/api/token", e, channel=request.channel, uid=request.uid)
+        raise _to_http_error(e)
 
 
 # API endpoints
