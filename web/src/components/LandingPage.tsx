@@ -100,6 +100,25 @@ export default function LandingPage() {
 		import("agora-rtm").catch(() => {});
 	}, []);
 
+	// Phase 2.3 leave guard: if the tab closes mid-conversation, best-effort
+	// stop the agent so minutes do not burn until idle_timeout (120s) fires.
+	useEffect(() => {
+		if (!showConversation || !agoraData?.agentId) return;
+		const agentId = agoraData.agentId;
+		const handlePageHide = () => {
+			try {
+				const blob = new Blob([JSON.stringify({ agentId })], {
+					type: "application/json",
+				});
+				navigator.sendBeacon("/api/stopAgent", blob);
+			} catch {
+				// Best-effort only; idle_timeout is the backstop.
+			}
+		};
+		window.addEventListener("pagehide", handlePageHide);
+		return () => window.removeEventListener("pagehide", handlePageHide);
+	}, [showConversation, agoraData?.agentId]);
+
 	const handleStartConversation = async () => {
 		setIsLoading(true);
 		setError(null);

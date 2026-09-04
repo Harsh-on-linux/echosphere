@@ -38,6 +38,9 @@ class FakeAgent:
     def __init__(self):
         self.started = []
         self.stopped = []
+        self.interrupted = []
+        self.history_calls = []
+        self.turns_calls = []
 
     async def start(self, channel_name, agent_uid, user_uid, output_audio_codec=None):
         self.started.append((channel_name, agent_uid, user_uid, output_audio_codec))
@@ -49,6 +52,23 @@ class FakeAgent:
 
     async def stop(self, agent_id):
         self.stopped.append(agent_id)
+
+    async def interrupt(self, agent_id):
+        if agent_id == "unknown-id":
+            raise ValueError(f"unknown agent_id: {agent_id}")
+        self.interrupted.append(agent_id)
+
+    async def get_history(self, agent_id):
+        if agent_id == "unknown-id":
+            raise ValueError(f"unknown agent_id: {agent_id}")
+        self.history_calls.append(agent_id)
+        return {"contents": []}
+
+    async def get_turns(self, agent_id, page_index=None, page_size=None):
+        if agent_id == "unknown-id":
+            raise ValueError(f"unknown agent_id: {agent_id}")
+        self.turns_calls.append((agent_id, page_index, page_size))
+        return {"turns": [], "page_index": page_index}
 
 
 @pytest.fixture

@@ -59,6 +59,45 @@ def test_stop_agent(client):
     assert client.fake_agent.stopped == ["fake-agent-111"]
 
 
+def test_interrupt_agent_calls_agent_and_returns_shape(client):
+    response = client.post("/interruptAgent", json={"agentId": "fake-agent-111"})
+    assert response.status_code == 200
+    assert response.json()["code"] == 0
+    assert client.fake_agent.interrupted == ["fake-agent-111"]
+
+
+def test_interrupt_unknown_agent_maps_to_400(client):
+    response = client.post("/interruptAgent", json={"agentId": "unknown-id"})
+    assert response.status_code == 400
+
+
+def test_agent_history_returns_data(client):
+    response = client.get("/agentHistory", params={"agentId": "fake-agent-111"})
+    assert response.status_code == 200
+    body = response.json()
+    assert body["code"] == 0
+    assert body["data"] == {"contents": []}
+    assert client.fake_agent.history_calls == ["fake-agent-111"]
+
+
+def test_agent_history_unknown_agent_maps_to_400(client):
+    assert client.get("/agentHistory", params={"agentId": "unknown-id"}).status_code == 400
+
+
+def test_agent_turns_forwards_pagination(client):
+    response = client.get(
+        "/agentTurns",
+        params={"agentId": "fake-agent-111", "pageIndex": 2, "pageSize": 5},
+    )
+    assert response.status_code == 200
+    assert response.json()["data"] == {"turns": [], "page_index": 2}
+    assert client.fake_agent.turns_calls == [("fake-agent-111", 2, 5)]
+
+
+def test_agent_turns_unknown_agent_maps_to_400(client):
+    assert client.get("/agentTurns", params={"agentId": "unknown-id"}).status_code == 400
+
+
 def test_value_error_maps_to_400(client, server_module):
     class BadAgent:
         async def start(self, **kwargs):
@@ -100,3 +139,6 @@ def test_misconfigured_agent_returns_500(client, server_module):
         == 500
     )
     assert client.post("/stopAgent", json={"agentId": "x"}).status_code == 500
+    assert client.post("/interruptAgent", json={"agentId": "x"}).status_code == 500
+    assert client.get("/agentHistory", params={"agentId": "x"}).status_code == 500
+    assert client.get("/agentTurns", params={"agentId": "x"}).status_code == 500

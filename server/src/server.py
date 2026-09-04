@@ -55,6 +55,23 @@ def _to_http_error(exc: Exception) -> HTTPException:
         return HTTPException(status_code=500, detail=str(exc))
     return HTTPException(status_code=500, detail=f"Internal error: {exc}")
 
+
+def _serialize(payload: Any) -> Any:
+    """Convert SDK pydantic responses to JSON-safe structures."""
+    if payload is None:
+        return None
+    if hasattr(payload, "model_dump"):
+        return payload.model_dump(mode="json")
+    if hasattr(payload, "dict"):
+        return payload.dict()
+    if isinstance(payload, (str, int, float, bool)):
+        return payload
+    if isinstance(payload, dict):
+        return {key: _serialize(value) for key, value in payload.items()}
+    if isinstance(payload, (list, tuple)):
+        return [_serialize(item) for item in payload]
+    return str(payload)
+
 try:
     agent = Agent()
 except ValueError as e:
@@ -94,6 +111,11 @@ class StartAgentRequest(BaseModel):
 
 class StopAgentRequest(BaseModel):
     """Request body for POST /stopAgent"""
+    agentId: str
+
+
+class InterruptAgentRequest(BaseModel):
+    """Request body for POST /interruptAgent (plan.md 2.2 manual interrupt)"""
     agentId: str
 
 
@@ -247,6 +269,65 @@ async def stop_agent(request: StopAgentRequest):
         return {"code": 0, "msg": "success"}
     except Exception as e:
         _log_route_error("/stopAgent", e, agentId=request.agentId)
+        raise _to_http_error(e)
+
+
+# --- Leave & conversation control (Phase 2.3) ---
+# idle_timeout=120 on every session auto-leaves after 2 min silence so no
+# free-tier minutes burn when a tab closes without an explicit leave.
+
+@router.post("/interruptAgent")
+async def interrupt_agent(request: InterruptAgentRequest):
+    """Manually interrupt a speaking/thinking agent (plan.md 2.2/5.1 demo)"""
+    if agent is None:
+        raise HTTPException(
+            status_code=500,
+            detail="Service not properly configured. Please check environment variables.",
+        )
+
+    try:
+        await agent.interrupt(request.agentId)
+        return {"code": 0, "msg": "success"}
+    except Exception as e:
+        _log_route_error("/interruptAgent", e, agentId=request.agentId)
+        raise _to_http_error(e)
+
+
+@router.get("/agentHistory")
+async def agent_history(agentId: str = Query(default=...)):
+    """Conversation history for verification (plan.md 2.1: check turns/latency)"""
+    if agent is None:
+        raise HTTPException(
+            status_code=500,
+            detail="Service not properly configured. Please check environment variables.",
+        )
+
+    try:
+        history = await agent.get_history(agentId)
+        return {"code": 0, "msg": "success", "data": _serialize(history)}
+    except Exception as e:
+        _log_route_error("/agentHistory", e, agentId=agentId)
+        raise _to_http_error(e)
+
+
+@router.get("/agentTurns")
+async def agent_turns(
+    agentId: str = Query(default=...),
+    pageIndex: Optional[int] = Query(default=None),
+    pageSize: Optional[int] = Query(default=None),
+):
+    """Per-turn latency metrics (plan.md 2.1: target <1s ASR+LLM+TTS)"""
+    if agent is None:
+        raise HTTPException(
+            status_code=500,
+            detail="Service not properly configured. Please check environment variables.",
+        )
+
+    try:
+        turns = await agent.get_turns(agentId, page_index=pageIndex, page_size=pageSize)
+        return {"code": 0, "msg": "success", "data": _serialize(turns)}
+    except Exception as e:
+        _log_route_error("/agentTurns", e, agentId=agentId)
         raise _to_http_error(e)
 
 
