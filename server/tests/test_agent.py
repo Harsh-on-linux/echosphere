@@ -51,11 +51,12 @@ def test_start_wires_managed_openai_and_returns_shape(fake_env, monkeypatch):
     instance = agent.Agent()
     result = asyncio.run(instance.start(channel_name="ch", agent_uid=111, user_uid=222))
 
-    assert result == {
-        "agent_id": "test-agent-id",
-        "channel_name": "ch",
-        "status": "started",
-    }
+    assert result["agent_id"] == "test-agent-id"
+    assert result["channel_name"] == "ch"
+    assert result["status"] == "started"
+    # Phase 4.1: voice routing info rides along (defaults: managed English)
+    assert result["language"] == "en-IN"
+    assert result["stt"] == "deepgram" and result["tts"] == "minimax"
     # The LLM stage is the managed OpenAI vendor (gpt-4o-mini), NOT CustomLLM.
     assert captured["llm"]["url"] == "https://api.openai.com/v1/chat/completions"
     assert captured["llm"]["params"]["model"] == "gpt-4o-mini"

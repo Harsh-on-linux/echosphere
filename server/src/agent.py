@@ -10,12 +10,34 @@ from typing import Any, Dict, Optional
 
 from agora_agent import Area, AsyncAgora
 from agora_agent.agentkit import Agent as AgoraAgent
-from agora_agent.agentkit.vendors import DeepgramSTT, MiniMaxTTS, OpenAI
+from agora_agent.agentkit.vendors import (
+    DeepgramSTT,
+    MiniMaxTTS,
+    OpenAI,
+    SarvamSTT,
+    SarvamTTS,
+)
 
 try:
-    from persona_prompt import GREETINGS, WEATHERGPT_SYSTEM
+    from persona_prompt import (
+        GREETINGS,
+        INDIC_LANGUAGES,
+        SARVAM_SPEAKER,
+        TURN_DETECTION_LANGUAGE,
+        WEATHERGPT_SYSTEM,
+        get_greeting,
+        normalize_language,
+    )
 except ImportError:  # pragma: no cover - fallback when run from a different cwd
-    from src.persona_prompt import GREETINGS, WEATHERGPT_SYSTEM  # type: ignore
+    from src.persona_prompt import (  # type: ignore
+        GREETINGS,
+        INDIC_LANGUAGES,
+        SARVAM_SPEAKER,
+        TURN_DETECTION_LANGUAGE,
+        WEATHERGPT_SYSTEM,
+        get_greeting,
+        normalize_language,
+    )
 
 logger = logging.getLogger("uvicorn.error")
 
@@ -83,6 +105,7 @@ class Agent:
         agent_uid: int,
         user_uid: int,
         output_audio_codec: Optional[str] = None,
+        language: Optional[str] = None,
     ) -> Dict[str, Any]:
         """Start agent with the same default vendor chain as the Next.js quickstart."""
         if not channel_name or not str(channel_name).strip():
@@ -92,6 +115,18 @@ class Agent:
         if user_uid <= 0:
             raise ValueError("user_uid is required and cannot be empty")
 
+        # Phase 4.1 — Indic pipeline (plan.md 4.1, research.md #12).
+        # en-IN (or missing Sarvam key): managed Deepgram + MiniMax, inside the
+        # $0.10/min bundle and 300 free mins. hi/ta/mr/bn-IN with SARVAM_API_KEY:
+        # Sarvam BYOK (₹100 free, code-mixed Hinglish support). "auto" uses
+        # Sarvam `unknown` STT auto-detect. Never fail: without a key, fall
+        # back to the managed English loop.
+        voice_language = normalize_language(language)
+        sarvam_key = (os.getenv("SARVAM_API_KEY") or "").strip()
+        use_sarvam = (voice_language in INDIC_LANGUAGES or voice_language == "auto") and bool(sarvam_key)
+        greeting = get_greeting(voice_language)
+        turn_language = TURN_DETECTION_LANGUAGE.get(voice_language, "en-US")
+
         # Default managed path: DeepgramSTT + OpenAI + MiniMaxTTS (plan.md 2.1).
         # Managed = included in the $0.10/min Conv AI price, inside 300 free mins.
         # Phase 3.3: attach IMD MCP so the LLM can call resolve_location +
@@ -100,7 +135,7 @@ class Agent:
         llm_kwargs: Dict[str, Any] = dict(
             model="gpt-4o-mini",
             system_messages=[{"role": "system", "content": WEATHERGPT_SYSTEM}],
-            greeting_message=self.greeting,
+            greeting_message=greeting,
             failure_message=self.failure_message,
             max_history=WEATHERGPT_MAX_HISTORY,
             max_tokens=1024,
@@ -110,8 +145,17 @@ class Agent:
         if mcp_servers is not None:
             llm_kwargs["mcp_servers"] = mcp_servers
         llm = OpenAI(**llm_kwargs)
-        stt = DeepgramSTT(model="nova-3", language="en")
-        tts = MiniMaxTTS(model="speech_2_6_turbo", voice_id="English_captivating_female1")
+        if use_sarvam:
+            stt_language = "unknown" if voice_language == "auto" else voice_language
+            tts_language = "en-IN" if voice_language == "auto" else voice_language
+            stt = SarvamSTT(api_key=sarvam_key, language=stt_language)
+            tts = SarvamTTS(key=sarvam_key, speaker=SARVAM_SPEAKER,
+                            target_language_code=tts_language)
+            stt_name, tts_name = "sarvam", "sarvam"
+        else:
+            stt = DeepgramSTT(model="nova-3", language="en")
+            tts = MiniMaxTTS(model="speech_2_6_turbo", voice_id="English_captivating_female1")
+            stt_name, tts_name = "deepgram", "minimax"
 
         # Optional BYOK example: replace the STT block above and set DEEPGRAM_API_KEY.
         # stt = DeepgramSTT(api_key=os.getenv("DEEPGRAM_API_KEY"), model="nova-3", language="en")
@@ -148,11 +192,11 @@ class Agent:
         agora_agent = AgoraAgent(
             client=self.client,
             instructions=WEATHERGPT_SYSTEM,
-            greeting=self.greeting,
+            greeting=greeting,
             failure_message=self.failure_message,
             max_history=WEATHERGPT_MAX_HISTORY,
             turn_detection={
-                "language": "en-US",
+                "language": turn_language,
                 "mode": "default",
                 "config": {
                     "speech_threshold": 0.5,
@@ -221,11 +265,14 @@ class Agent:
             agent_uid,
             user_uid,
         )
-        
+
         return {
             "agent_id": agent_id,
             "channel_name": channel_name,
             "status": "started",
+            "language": voice_language,
+            "stt": stt_name,
+            "tts": tts_name,
         }
 
     async def stop(self, agent_id: str) -> None:

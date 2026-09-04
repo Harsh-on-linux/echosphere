@@ -35,6 +35,55 @@ GREETINGS = {
     "bn-IN": "Namaskar, ami WeatherGPT. Kon jelar abhawa jante chan?",
 }
 
+# Phase 4.1 — Indic pipeline languages (plan.md 4.1, research.md #12).
+# en-IN runs managed (Deepgram + MiniMax, inside 300 free mins).
+# hi/ta/mr/bn-IN run Sarvam BYOK (STT+TTS) when SARVAM_API_KEY is set,
+# else fall back to the managed English loop — never fail a session.
+SUPPORTED_LANGUAGES = ("en-IN", "hi-IN", "ta-IN", "mr-IN", "bn-IN")
+INDIC_LANGUAGES = ("hi-IN", "ta-IN", "mr-IN", "bn-IN")
+DEFAULT_LANGUAGE = "en-IN"
+SARVAM_SPEAKER = "anushka"
+
+# Shorthand -> BCP-47 map for frontend dropdowns and API params.
+_LANGUAGE_ALIASES = {
+    "en": "en-IN", "english": "en-IN",
+    "hi": "hi-IN", "hindi": "hi-IN",
+    "ta": "ta-IN", "tamil": "ta-IN",
+    "mr": "mr-IN", "marathi": "mr-IN",
+    "bn": "bn-IN", "bengali": "bn-IN", "bangla": "bn-IN",
+    "auto": "auto",
+}
+
+# turn_detection language per voice language (AGENTS.md #6: set together
+# with asr.params.language). "auto" uses Sarvam `unknown` for STT and keeps
+# VAD on en-US.
+TURN_DETECTION_LANGUAGE = {
+    "en-IN": "en-US",
+    "hi-IN": "hi-IN",
+    "ta-IN": "ta-IN",
+    "mr-IN": "mr-IN",
+    "bn-IN": "bn-IN",
+    "auto": "en-US",
+}
+
+def normalize_language(language: str | None) -> str:
+    """Map shorthand/empty input to a supported tag or 'auto'."""
+    if not language:
+        return DEFAULT_LANGUAGE
+    key = language.strip().lower()
+    canonical = {tag.lower(): tag for tag in SUPPORTED_LANGUAGES}
+    canonical["auto"] = "auto"
+    if key in canonical:
+        return canonical[key]
+    return _LANGUAGE_ALIASES.get(key, DEFAULT_LANGUAGE)
+
+def get_greeting(language: str | None = None) -> str:
+    """Greeting in the session language (plan.md 4.3 single_first)."""
+    lang = normalize_language(language)
+    if lang == "auto":
+        return GREETINGS["hi-IN"]
+    return GREETINGS.get(lang, GREETINGS[DEFAULT_LANGUAGE])
+
 def get_system_prompt(persona: str = "general") -> str:
     base = WEATHERGPT_SYSTEM
     if persona == "farmer":
