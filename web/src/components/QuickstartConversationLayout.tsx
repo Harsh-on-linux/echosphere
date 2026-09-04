@@ -11,6 +11,7 @@ type QuickstartConversationLayoutProps = {
 	transcriptPanel: ReactNode;
 	visualizer: ReactNode;
 	controls: ReactNode;
+	metricsOverlay?: ReactNode;
 	onEndConversation: () => void;
 	/** Phase 2: IMD source attribution card under the transcript (optional). */
 	imdSourceCard?: ReactNode;
@@ -22,6 +23,7 @@ export function QuickstartConversationLayout({
 	transcriptPanel,
 	visualizer,
 	controls,
+	metricsOverlay,
 	onEndConversation,
 	imdSourceCard,
 }: QuickstartConversationLayoutProps) {
@@ -75,6 +77,7 @@ export function QuickstartConversationLayout({
 						<div className="flex min-h-0 flex-1 items-center justify-center">
 							{visualizer}
 						</div>
+						{metricsOverlay ? <div className="shrink-0 pb-2">{metricsOverlay}</div> : null}
 						<div className="shrink-0 pt-4">{controls}</div>
 					</div>
 				</main>

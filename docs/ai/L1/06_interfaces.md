@@ -99,6 +99,12 @@ agent_id = await session.start()
 
 `ConversationComponent.tsx` also attaches a raw RTM `message` listener as a fallback for the same `message.error` / `message.sal_status` payloads.
 
+`ConversationComponent.tsx` normalizes metric timestamps to milliseconds and
+keeps the latest twelve valid events. `AgentMetricsOverlay` displays the
+latest tracked ASR, LLM, and TTS values, their sum against the 1200 ms demo
+target, and the current RTM agent state. Metrics are enabled by the backend's
+`parameters.enable_metrics=true` setting.
+
 ## Internal Types
 
 | Type                          | Lives in                                       | Notes                                            |

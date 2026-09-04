@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 
+import { AgentMetricsOverlay } from "@/components/AgentMetricsOverlay";
 import { ConnectionStatusPanel } from "@/components/ConnectionStatusPanel";
 import {
 	type ConnectionIssue,
@@ -22,6 +23,7 @@ import {
 	getCurrentInProgressMessage,
 	getMessageList,
 	mapAgentVisualizerState,
+	normalizeAgentMetric,
 	normalizeTimestampMs,
 	normalizeTranscript,
 } from "@/lib/conversation";
@@ -205,7 +207,9 @@ export default function ConversationComponent({
 					setAgentState(event.state),
 				);
 				ai.on(AgoraVoiceAIEvents.AGENT_METRICS, (_, metrics) => {
-					setAgentMetrics((prev) => [...prev, metrics].slice(-8));
+					const nextMetric = normalizeAgentMetric(metrics);
+					if (!nextMetric) return;
+					setAgentMetrics((prev) => [...prev, nextMetric].slice(-12));
 				});
 				ai.on(AgoraVoiceAIEvents.MESSAGE_ERROR, (agentUserId, error) => {
 					addConnectionIssue({
@@ -464,6 +468,7 @@ export default function ConversationComponent({
 					))}
 				</VoiceOrb>
 			}
+			metricsOverlay={<AgentMetricsOverlay agentState={agentState} metrics={agentMetrics} />}
 			imdSourceCard={<IMDSourceCard />}
 			controls={
 				<div className="mx-auto flex w-fit flex-wrap items-center justify-center gap-3">
