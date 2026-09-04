@@ -90,3 +90,19 @@ def test_unknown_persona_maps_to_general(fake_env, monkeypatch):
     agent_mod, captured, result = _start(fake_env, monkeypatch, persona="astronaut")
     assert result["persona"] == "general"
     assert "Persona hint" not in captured["config"]["instructions"]
+
+
+def test_greeting_configs_single_first(fake_env, monkeypatch):
+    agent_mod, captured, result = _start(fake_env, monkeypatch, language="hi-IN")
+    greeting_configs = captured["config"]["greeting_configs"]
+    assert greeting_configs["mode"] == "single_first"
+    assert greeting_configs["interruptable"] is True
+    assert greeting_configs["delay_ms"] == 200
+
+
+def test_filler_words_cover_imd_latency(fake_env, monkeypatch):
+    agent_mod, captured, result = _start(fake_env, monkeypatch)
+    filler = captured["config"]["filler_words"]
+    assert filler["enable"] is True
+    phrases = filler["content"]["static_config"]["phrases"]
+    assert len(phrases) >= 2 and all(isinstance(p, str) and p for p in phrases)

@@ -84,6 +84,17 @@ def get_greeting(language: str | None = None) -> str:
         return GREETINGS["hi-IN"]
     return GREETINGS.get(lang, GREETINGS[DEFAULT_LANGUAGE])
 
+# Phase 4.3 — greeting & filler polish (plan.md 4.3).
+# Single greeting on first join (interruptable, 200ms delay); static filler
+# phrases cover IMD tool-call latency so the first 3 seconds feel seamless.
+GREETING_CONFIGS = {"mode": "single_first", "interruptable": True, "delay_ms": 200}
+FILLER_PHRASES = [
+    "Ek second, IMD check kar raha hun...",
+    "One moment, checking the latest IMD bulletin...",
+    "Thoda samay dijiye, IMD data la raha hun...",
+]
+FILLER_WORDS = {"enable": True, "content": {"static_config": {"phrases": FILLER_PHRASES}}}
+
 def get_system_prompt(persona: str = "general") -> str:
     base = WEATHERGPT_SYSTEM
     if persona == "farmer":

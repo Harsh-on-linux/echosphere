@@ -21,7 +21,9 @@ from agora_agent.agentkit.vendors import (
 try:
     from persona_prompt import (
         DEFAULT_PERSONA,
+        FILLER_WORDS,
         GREETINGS,
+        GREETING_CONFIGS,
         INDIC_LANGUAGES,
         PERSONA_TTS_RATE,
         SARVAM_SPEAKER,
@@ -35,7 +37,9 @@ try:
 except ImportError:  # pragma: no cover - fallback when run from a different cwd
     from src.persona_prompt import (  # type: ignore
         DEFAULT_PERSONA,
+        FILLER_WORDS,
         GREETINGS,
+        GREETING_CONFIGS,
         INDIC_LANGUAGES,
         PERSONA_TTS_RATE,
         SARVAM_SPEAKER,
@@ -209,6 +213,10 @@ class Agent:
             greeting=greeting,
             failure_message=self.failure_message,
             max_history=WEATHERGPT_MAX_HISTORY,
+            # Phase 4.3: single interruptable greeting + static fillers mask
+            # IMD tool-call latency ("Ek second, IMD check kar raha hun...").
+            greeting_configs=dict(GREETING_CONFIGS),
+            filler_words=dict(FILLER_WORDS),
             turn_detection={
                 "language": turn_language,
                 "mode": "default",
