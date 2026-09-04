@@ -72,10 +72,11 @@ def _start_and_capture_llm(fake_env, monkeypatch, agent_mod_name="agent"):
 def test_agent_wires_mcp_servers_from_backend_url(fake_env, monkeypatch):
     monkeypatch.setenv("BACKEND_URL", "https://example.com")
     monkeypatch.delenv("MCP_SERVER_URL", raising=False)
+    monkeypatch.delenv("MCP_ENDPOINT", raising=False)
     agent_mod, captured = _start_and_capture_llm(fake_env, monkeypatch)
     mcp = captured["llm"].get("mcp_servers")
-    assert mcp == [{"url": "https://example.com/mcp",
-                    "transport": "streamable_http", "name": "imd"}]
+    assert mcp == [{"name": "imd", "endpoint": "https://example.com/mcp",
+                    "transport": "streamable_http"}]
     # enable_tools stays on so Agora actually calls the MCP server
     adv = captured["config"].get("advanced_features")
     enabled = adv.get("enable_tools") if isinstance(adv, dict) else getattr(adv, "enable_tools", None)
@@ -86,12 +87,13 @@ def test_agent_prefers_explicit_mcp_server_url(fake_env, monkeypatch):
     monkeypatch.setenv("BACKEND_URL", "https://example.com")
     monkeypatch.setenv("MCP_SERVER_URL", "https://mcp.example.com/imd")
     agent_mod, captured = _start_and_capture_llm(fake_env, monkeypatch)
-    assert captured["llm"]["mcp_servers"][0]["url"] == "https://mcp.example.com/imd"
+    assert captured["llm"]["mcp_servers"][0]["endpoint"] == "https://mcp.example.com/imd"
 
 
 def test_agent_omits_mcp_servers_when_unconfigured(fake_env, monkeypatch):
     monkeypatch.delenv("BACKEND_URL", raising=False)
     monkeypatch.delenv("MCP_SERVER_URL", raising=False)
+    monkeypatch.delenv("MCP_ENDPOINT", raising=False)
     agent_mod, captured = _start_and_capture_llm(fake_env, monkeypatch)
     assert captured["llm"].get("mcp_servers") is None
     # Managed OpenAI shape unchanged (Phase 2 regression)

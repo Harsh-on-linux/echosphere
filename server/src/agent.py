@@ -147,20 +147,28 @@ def get_sal_config() -> Optional[Dict[str, Any]]:
 def get_mcp_servers() -> Optional[list]:
     """Build llm.mcp_servers for Agora (plan.md 3.3, research.md #6).
 
-    Agora calls POST {url} (JSON-RPC) when the LLM decides to use an IMD tool.
-    URL must be public HTTPS in prod (plan.md 6.1); localhost works for tests
-    to verify config shape. Returns None when unconfigured so managed-only
-    sessions stay byte-identical to Phase 2.
+    Agora cloud POSTs {endpoint} (JSON-RPC, streamable_http) when the LLM
+    decides to use an IMD tool. Endpoint must be public HTTPS in prod
+    (plan.md 6.1); localhost only verifies config shape in tests. Returns
+    None when unconfigured so managed-only sessions stay voice-only.
     """
-    explicit = (os.getenv("MCP_SERVER_URL") or "").strip()
+    explicit = (os.getenv("MCP_SERVER_URL") or os.getenv("MCP_ENDPOINT") or "").strip()
     if explicit:
         url = explicit
     else:
         backend = (os.getenv("BACKEND_URL") or "").strip().rstrip("/")
         if not backend:
+            logger.warning(
+                "MCP URL unconfigured (set MCP_SERVER_URL or BACKEND_URL); "
+                "starting voice-only without IMD tools"
+            )
             return None
         url = f"{backend}/mcp"
-    return [{"url": url, "transport": "streamable_http", "name": "imd"}]
+    if not url.startswith("https://") and "localhost" not in url and "127.0.0.1" not in url:
+        logger.warning("MCP endpoint %s is not public HTTPS; Agora cloud tool calls will fail", url)
+    # NOTE: Agora REST field is "endpoint", not "url" (see join API +
+    # recipe-agent-mcp mcp_config.py). Wrong key is silently ignored.
+    return [{"name": "imd", "endpoint": url, "transport": "streamable_http"}]
 
 
 class Agent:

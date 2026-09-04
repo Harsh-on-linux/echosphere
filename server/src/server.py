@@ -134,7 +134,7 @@ def _deploy_urls() -> dict:
     the configured MCP URL satisfies that before any voice session starts.
     """
     backend_url = (os.getenv("BACKEND_URL") or "").strip().rstrip("/")
-    mcp_url = (os.getenv("MCP_SERVER_URL") or "").strip()
+    mcp_url = (os.getenv("MCP_SERVER_URL") or os.getenv("MCP_ENDPOINT") or "").strip()
     if not mcp_url and backend_url:
         mcp_url = f"{backend_url}/mcp"
     return {
