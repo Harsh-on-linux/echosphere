@@ -172,6 +172,47 @@ async def get_all_india_warning(district_id: Optional[str] = None) -> Dict[str, 
     params = {"id": district_id} if district_id else None
     return await _fetch(url, params=params, mock_name="districtnowcast_pune")
 
+async def get_subdivision_warning(subdivision: Optional[str] = None) -> Dict[str, Any]:
+    """Subdivision-wise Warnings — GET /api/v1/subdivisionwarning (plan.md 3.4 state-wide)."""
+    url = f"{IMD_BASE}/subdivisionwarning"
+    params = {"subdivision": subdivision} if subdivision else None
+    return await _fetch(url, params=params, mock_name="districtnowcast_pune")
+
+async def get_forecast_for_location(location_text: str) -> Dict[str, Any]:
+    """Spatial-reasoning forecast (plan.md 3.4): resolve -> district forecast,
+    else nearest lat/lon retry, else state-wide subdivision warning hint.
+
+    Never raises for unknown places: returns candidates + fallback payload so
+    the voice agent asks ONE clarification instead of looping.
+    """
+    from location_resolver import resolve_with_fallback
+
+    resolution = resolve_with_fallback(location_text)
+    if resolution.get("district_id"):
+        data = await get_city_forecast_7d(resolution["district_id"])
+        data["resolution"] = resolution
+        return data
+    fallback = resolution.get("fallback") or {}
+    nearest = fallback.get("nearest")
+    if nearest:
+        data = await get_city_forecast_latlon(nearest["lat"], nearest["lon"])
+        data["resolution"] = resolution
+        data["_fallback_used"] = "latlon"
+        return data
+    if resolution.get("state_hint"):
+        data = await get_subdivision_warning(resolution["state_hint"])
+        data["resolution"] = resolution
+        data["_fallback_used"] = "subdivision"
+        return data
+    return {
+        "status": "clarify",
+        "message": resolution.get("message", "Location unclear"),
+        "source": "location_resolver",
+        "cached_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+        "resolution": resolution,
+        "data": [],
+    }
+
 async def get_agromet_advisory(district_id: str) -> Dict[str, Any]:
     """Agromet bulletin — reuses forecast mock (real agromet API not public, mock for hackathon)."""
     url = f"{IMD_BASE}/agromet"

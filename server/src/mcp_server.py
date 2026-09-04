@@ -86,6 +86,27 @@ try:
 
         return await _fn(district_id)
 
+    @mcp.tool()
+    async def get_subdivision_warning(subdivision: Optional[str] = None) -> dict:
+        """Subdivision warnings for state-wide queries — GET /api/v1/subdivisionwarning"""
+        from imd_client import get_subdivision_warning as _fn
+
+        return await _fn(subdivision)
+
+    @mcp.tool()
+    async def resolve_with_fallback(location_text: str) -> dict:
+        """Resolve + spatial fallback: candidates + nearest lat/lon + state_hint. Use when resolve_location confidence is low."""
+        from location_resolver import resolve_with_fallback as _fn
+
+        return _fn(location_text)
+
+    @mcp.tool()
+    async def get_forecast_for_location(location_text: str) -> dict:
+        """One-call forecast: resolve -> district forecast, else lat/lon retry. Returns clarification payload for unknown places."""
+        from imd_client import get_forecast_for_location as _fn
+
+        return await _fn(location_text)
+
 except Exception as e:
     # Graceful fallback for dev without fastmcp installed; keep importable for tests
     mcp = None

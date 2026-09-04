@@ -149,5 +149,54 @@ def get_district_by_id(district_id: str) -> Optional[Dict[str, Any]]:
             return d
     return None
 
+
+def _detect_state_hint(query: str) -> Optional[str]:
+    """Return state name if the query looks state-wide (plan.md 3.4)."""
+    districts = _load_districts()
+    states = sorted({d["state"].lower() for d in districts if d.get("state")})
+    for state in states:
+        if state in query:
+            # return canonical casing from data
+            for d in districts:
+                if d.get("state", "").lower() == state:
+                    return d["state"]
+    return None
+
+
+def resolve_with_fallback(location_text: str, threshold: int = 70) -> Dict[str, Any]:
+    """Resolve + spatial fallback (plan.md 3.4).
+
+    - confidence >= threshold: resolved, fallback=None.
+    - confidence < threshold: candidates (top 3) for clarification + nearest
+      lat/lon of the best candidate so the caller can retry via
+      cityforecast?lat=&lon=. Includes state_hint when the query names a
+      state (caller should use subdivision warnings).
+    """
+    result = fuzzy_match(location_text, threshold=threshold)
+    query = (location_text or "").strip().lower()
+    state_hint = _detect_state_hint(query)
+
+    if result.get("district_id"):
+        result["fallback"] = None
+        result["state_hint"] = state_hint
+        return result
+
+    # Low confidence: attach nearest lat/lon from best candidate for GPS retry.
+    nearest = None
+    candidates = result.get("candidates") or []
+    if candidates:
+        top = get_district_by_id(candidates[0]["district_id"])
+        if top and top.get("lat") is not None and top.get("lon") is not None:
+            nearest = {"lat": top["lat"], "lon": top["lon"],
+                       "district_id": top["district_id"],
+                       "district_name": top["district_name"]}
+    result["fallback"] = {
+        "strategy": "clarify_then_latlon",
+        "nearest": nearest,
+        "note": "Ask single clarification; on retry use lat/lon fallback.",
+    }
+    result["state_hint"] = state_hint
+    return result
+
 def all_districts() -> List[Dict[str, Any]]:
     return _load_districts()
