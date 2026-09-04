@@ -105,9 +105,28 @@ def test_start_wires_weathergpt_voice_loop(fake_env, monkeypatch):
     turn_detection = config["turn_detection"]
     language = turn_detection.get("language") if isinstance(turn_detection, dict) else getattr(turn_detection, "language", None)
     assert language == "en-US"
+    assert turn_detection["mode"] == "default"
+    assert turn_detection["config"] == {
+        "speech_threshold": 0.5,
+        "start_of_speech": {
+            "mode": "vad",
+            "vad_config": {
+                "interrupt_threshold": 0.5,
+                "prefix_padding_ms": 250,
+            },
+        },
+        "end_of_speech": {
+            "mode": "vad",
+            "vad_config": {
+                "silence_duration_ms": 700,
+                "pause_state_enabled": True,
+            },
+        },
+    }
     interruption = config["interruption"]
     enabled = interruption.get("enable") if isinstance(interruption, dict) else getattr(interruption, "enable", None)
     assert enabled is True
+    assert interruption["mode"] == "start_of_speech"
     # Free-tier guard: 2 min idle timeout, wx- session names
     assert captured["idle_timeout"] == 120
     assert str(captured["name"]).startswith("wx-")

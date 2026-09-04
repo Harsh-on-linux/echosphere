@@ -225,14 +225,17 @@ class Agent:
                     "start_of_speech": {
                         "mode": "vad",
                         "vad_config": {
-                            "interrupt_duration_ms": 160,
-                            "prefix_padding_ms": 300,
+                            # Balanced for quiet rooms and short spoken
+                            # interruptions such as "Ruko" or "Nahi".
+                            "interrupt_threshold": 0.5,
+                            "prefix_padding_ms": 250,
                         },
                     },
                     "end_of_speech": {
                         "mode": "vad",
                         "vad_config": {
-                            "silence_duration_ms": 480,
+                            "silence_duration_ms": 700,
+                            "pause_state_enabled": True,
                         },
                     },
                 },
