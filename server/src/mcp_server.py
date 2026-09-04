@@ -107,6 +107,13 @@ try:
 
         return await _fn(location_text)
 
+    @mcp.tool()
+    async def get_openmeteo_forecast(lat: float, lon: float) -> dict:
+        """Live 7-day secondary forecast (ECMWF/GFS) via Open-Meteo by coordinates. Zero-downtime failover."""
+        from openmeteo_client import get_openmeteo_forecast as _fn
+
+        return await _fn(lat, lon)
+
 except Exception as e:
     # Graceful fallback for dev without fastmcp installed; keep importable for tests
     mcp = None

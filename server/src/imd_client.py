@@ -270,6 +270,11 @@ async def get_sun_moon(lat: float, lon: float) -> Dict[str, Any]:
     url = f"{IMD_BASE}/sunmoon"
     return await _fetch(url, params={"lat": lat, "lon": lon}, mock_name="cityforecast_pune")
 
+async def get_live_fallback_forecast(lat: float, lon: float) -> Dict[str, Any]:
+    """Secondary meteorological forecast via Open-Meteo (ECMWF/GFS) when IMD is offline."""
+    from openmeteo_client import get_openmeteo_forecast
+    return await get_openmeteo_forecast(lat, lon)
+
 # Utility for tests / health
 def clear_cache() -> None:
     cache.clear()
