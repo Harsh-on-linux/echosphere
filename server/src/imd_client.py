@@ -10,6 +10,7 @@ Usage:
     from imd_client import get_city_forecast_7d, get_district_nowcast, ...
     data = await get_city_forecast_7d(district_id="528")
 """
+import asyncio
 import json
 import os
 import pathlib
@@ -18,7 +19,7 @@ from typing import Any, Dict, Optional
 
 import httpx
 from cachetools import TTLCache
-from tenacity import retry, stop_after_attempt, wait_exponential
+from tenacity import retry, retry_if_exception, stop_after_attempt, wait_exponential
 
 # Base IMD gateway — whitelisting required at https://api.imd.gov.in/public/index.php
 IMD_BASE = os.getenv("IMD_API_URL", "https://api.imd.gov.in/api/v1")
@@ -27,6 +28,28 @@ USE_MOCK = os.getenv("USE_MOCK_IMD", "true").lower() in ("1", "true", "yes")
 
 # In-memory TTL cache (128 entries, 5 min) — no Redis needed for hackathon
 cache: TTLCache = TTLCache(maxsize=128, ttl=CACHE_TTL)
+
+# Last good response per cache key (no TTL) — served stale with _stale=True
+# during an IMD outage so the voice agent answers from data, not errors.
+last_good: Dict[str, Dict[str, Any]] = {}
+
+# Rate-limit guard (plan.md 7.3): bound concurrent IMD requests so bursts
+# back off instead of tripping IMD limits. Override via IMD_MAX_CONCURRENCY.
+MAX_IMD_CONCURRENCY = int(os.getenv("IMD_MAX_CONCURRENCY", "4"))
+_SEMAPHORE = asyncio.Semaphore(MAX_IMD_CONCURRENCY)
+
+# Transient failures worth a tenacity backoff before degrading.
+_RETRYABLE_STATUS = {429, 500, 502, 503, 504}
+
+
+def _is_retryable(exc: BaseException) -> bool:
+    if isinstance(exc, (httpx.TimeoutException, httpx.ConnectError)):
+        return True
+    return (
+        isinstance(exc, httpx.HTTPStatusError)
+        and exc.response is not None
+        and exc.response.status_code in _RETRYABLE_STATUS
+    )
 
 # Shared httpx client (reused across calls)
 _client: Optional[httpx.AsyncClient] = None
@@ -61,9 +84,28 @@ def _load_mock(name: str) -> Dict[str, Any]:
         "data": [],
     }
 
-@retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=0.5, min=0.5, max=2))
+@retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=0.5, min=0.5, max=2),
+       retry=retry_if_exception(_is_retryable), reraise=True)
+async def _live_get(url: str, params: Optional[Dict[str, Any]]) -> Dict[str, Any]:
+    """One IMD HTTP round-trip with backoff on 429/5xx + connect timeouts."""
+    client = _get_client()
+    async with _SEMAPHORE:
+        resp = await client.get(url, params=params)
+        resp.raise_for_status()
+        return resp.json()
+
+
+def _now() -> str:
+    return time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+
+
 async def _fetch(url: str, params: Optional[Dict[str, Any]] = None, mock_name: Optional[str] = None) -> Dict[str, Any]:
-    """Fetch with cache, retry, and mock fallback."""
+    """Fetch with cache, retry, and degraded fallback (plan.md 7.3).
+
+    Order: warm TTL cache -> mock shortcut (dev) -> live with backoff ->
+    last-good stale -> mock + _fallback_reason. The voice agent never sees
+    an exception for a known endpoint; it always has source + timestamp.
+    """
     key = _cache_key(url, params)
     if key in cache:
         return cache[key]
@@ -72,23 +114,28 @@ async def _fetch(url: str, params: Optional[Dict[str, Any]] = None, mock_name: O
         # In mock mode, return sample JSON immediately (and cache it)
         data = _load_mock(mock_name)
         cache[key] = data
+        last_good[key] = data
         return data
 
     # Live fetch
     try:
-        client = _get_client()
-        resp = await client.get(url, params=params)
-        resp.raise_for_status()
-        data = resp.json()
+        data = await _live_get(url, params)
         # Ensure attribution fields
         if "source" not in data:
             data["source"] = url
         if "cached_at" not in data:
-            data["cached_at"] = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+            data["cached_at"] = _now()
         cache[key] = data
+        last_good[key] = data
         return data
     except Exception as e:
-        # On failure, try mock fallback instead of bubbling 500 to voice agent
+        # Outage: prefer the last good response (marked stale) over mock.
+        if key in last_good:
+            stale = dict(last_good[key])
+            stale["_stale"] = True
+            stale["_fallback_reason"] = str(e)
+            return stale
+        # Cold cache: mock fallback instead of bubbling 500 to voice agent
         if mock_name:
             data = _load_mock(mock_name)
             # annotate that it is fallback due to error
@@ -226,6 +273,8 @@ async def get_sun_moon(lat: float, lon: float) -> Dict[str, Any]:
 # Utility for tests / health
 def clear_cache() -> None:
     cache.clear()
+    last_good.clear()
 
 def cache_info() -> Dict[str, Any]:
-    return {"size": len(cache), "maxsize": cache.maxsize, "ttl": cache.ttl, "use_mock": USE_MOCK}
+    return {"size": len(cache), "maxsize": cache.maxsize, "ttl": cache.ttl, "use_mock": USE_MOCK,
+            "last_good": len(last_good), "max_concurrency": MAX_IMD_CONCURRENCY}
