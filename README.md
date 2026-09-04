@@ -61,13 +61,33 @@ Services:
 
 ## Deploy
 
-Deploy `web` as a Next.js app and `server` as a reachable Python service.
+Deploy `web` as a Next.js app (Vercel Hobby) and `server` as a reachable Python service
+(Render Free via `render.yaml` Blueprint). This is plan.md Step 6.1.
 
-Browser-facing `/api/*` routes in Next proxy to FastAPI via:
+1. **Backend (Render):** Dashboard -> New -> Blueprint -> select this repo's `render.yaml`.
+   Set secrets (`AGORA_APP_ID`, `AGORA_APP_CERTIFICATE`, `SARVAM_API_KEY`) in the
+   dashboard — never commit them. After the first deploy, set `BACKEND_URL` to the
+   live `https://<service>.onrender.com` URL and redeploy.
+2. **Why HTTPS matters:** Agora calls `llm.mcp_servers` server-side, so `/mcp` must be
+   public HTTPS in prod. `GET /health` reports `mcp_url` + `mcp_public_https` — check it
+   before any voice session.
+3. **Frontend (Vercel):** import `web/`, set `AGENT_BACKEND_URL` to the Render URL
+   (see `web/.env.example`). Browser-facing `/api/*` routes in Next proxy to FastAPI via:
 
 ```bash
 AGENT_BACKEND_URL=https://your-python-backend.example.com
 ```
+
+4. **Verify a deployment:**
+
+```bash
+BACKEND_URL=https://your-python-backend.example.com bash scripts/verify-deploy.sh
+```
+
+This curls `/health` (expects `status: ok`, `agora_configured: true`,
+`mcp_public_https: true`) and `POST /mcp` `tools/list`. Then run one full voice
+session via the production URL per plan.md 6.1.
+
 
 Set backend env values:
 
@@ -92,8 +112,10 @@ Primary backend env file: [`server/.env.example`](server/.env.example).
 | --- | :---: | :---: | --- |
 | `AGORA_APP_ID` | ✅ | — | Agora Console -> Project -> App ID |
 | `AGORA_APP_CERTIFICATE` | ✅ | — | Agora Console -> Project -> App Certificate (server only) |
-| `PORT` |  | `8000` | FastAPI server port |
+| `PORT` |  | `8000` | FastAPI server port (Render injects its own) |
 | `AGENT_BACKEND_URL` (web deploy) | ✅ | — | Required in deployed `web` app when proxying to external FastAPI |
+| `BACKEND_URL` (server deploy) | ✅ | — | Public https backend URL; defaults `llm.mcp_servers` to `{BACKEND_URL}/mcp` |
+| `FRONTEND_URL` (server deploy) | ✅ | — | Vercel URL (comma-separated ok) for CORS; localhost allowed by default |
 
 > **Default vs BYOK** — this quickstart defaults to Agora-managed STT + LLM + TTS in the backend. Enable BYOK by uncommenting provider blocks in `server/src/agent.py` and adding matching keys.
 

@@ -37,6 +37,8 @@ except Exception:
 # path="/mcp" so the final route is exactly /mcp (not /mcp/mcp).
 # stateless_http=True: each JSON-RPC POST is self-contained (no session
 # handshake), which suits Agora tool calls + TestClient verification.
+logger = logging.getLogger("uvicorn.error")
+
 _mcp_http_app = None
 try:
     from mcp_server import get_mcp
@@ -47,8 +49,6 @@ try:
 except Exception as e:
     logger.warning("MCP server unavailable: %s", e)
     _mcp_http_app = None
-
-logger = logging.getLogger("uvicorn.error")
 
 
 def _log_route_error(route: str, exc: Exception, **context) -> None:
@@ -98,6 +98,45 @@ except ValueError as e:
     agent = None
 
 
+def _cors_origins() -> list:
+    """Allowed browser origins (plan.md 6.1 deploy).
+
+    Local dev (Next on :3000 -> FastAPI on :8000) works out of the box.
+    In prod, set FRONTEND_URL to the Vercel URL (comma-separated ok for
+    preview deployments). Explicit list — never "*" with credentials.
+    """
+    origins = [
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "http://localhost:8000",
+        "http://127.0.0.1:8000",
+    ]
+    raw = (os.getenv("FRONTEND_URL") or "").strip()
+    for part in raw.split(","):
+        origin = part.strip().rstrip("/")
+        if origin and origin not in origins:
+            origins.append(origin)
+    return origins
+
+
+def _deploy_urls() -> dict:
+    """Public URLs Agora + browser need in prod (plan.md 6.1).
+
+    Agora requires HTTPS for llm.mcp_servers, so /health reports whether
+    the configured MCP URL satisfies that before any voice session starts.
+    """
+    backend_url = (os.getenv("BACKEND_URL") or "").strip().rstrip("/")
+    mcp_url = (os.getenv("MCP_SERVER_URL") or "").strip()
+    if not mcp_url and backend_url:
+        mcp_url = f"{backend_url}/mcp"
+    return {
+        "backend_url": backend_url or None,
+        "mcp_url": mcp_url or None,
+        "mcp_public_https": mcp_url.startswith("https://"),
+        "frontend_url_configured": bool((os.getenv("FRONTEND_URL") or "").strip()),
+    }
+
+
 # FastAPI application
 # Phase 3.2: forward the MCP lifespan so POST /mcp works when mounted
 # (FastMCP ASGI integration requires lifespan=mcp_app.lifespan).
@@ -111,11 +150,12 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=_cors_origins(),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 router = APIRouter()
 
@@ -164,6 +204,7 @@ async def health():
         "version": "1.2.0",
         "agora_configured": agent is not None,
         "imd_cache": info,
+        **_deploy_urls(),
     }
 
 
@@ -367,4 +408,6 @@ if __name__ == "__main__":
     import uvicorn
 
     port = int(os.getenv("PORT", "8000"))
-    uvicorn.run(app, host="0.0.0.0", port=port)
+    # proxy_headers: Render/Railway terminate TLS at the edge and forward
+    # X-Forwarded-Proto — needed so generated URLs respect https (plan.md 6.1).
+    uvicorn.run(app, host="0.0.0.0", port=port, proxy_headers=True, forwarded_allow_ips="*")

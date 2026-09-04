@@ -17,5 +17,9 @@ COPY --chown=app:app server/src /app/server/src
 USER app
 
 # server.py reads $PORT (default 8000) and binds 0.0.0.0.
+# Render/Railway inject PORT automatically — do not hardcode it.
+ENV PYTHONUNBUFFERED=1 PORT=8000
 EXPOSE 8000
+HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
+  CMD python -c "import os, urllib.request; urllib.request.urlopen('http://127.0.0.1:' + os.getenv('PORT', '8000') + '/health')"
 CMD ["python", "/app/server/src/server.py"]
