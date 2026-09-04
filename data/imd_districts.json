@@ -8,7 +8,73 @@
     "lat": 18.5204,
     "lon": 73.8567,
     "imd_station_id": "43063",
-    "aliases": ["Puna", "Poona", "पुणे"]
+    "agro_zone": "Western Maharashtra Scarcity Zone",
+    "aliases": [
+      "Puna",
+      "Poona",
+      "पुणे"
+    ],
+    "tehsils": [
+      {
+        "name": "Baramati",
+        "lat": 18.1517,
+        "lon": 74.5772,
+        "aliases": [
+          "बारामती",
+          "Baramatee"
+        ]
+      },
+      {
+        "name": "Haveli",
+        "lat": 18.5204,
+        "lon": 73.8567,
+        "aliases": [
+          "हवेली"
+        ]
+      },
+      {
+        "name": "Shirur",
+        "lat": 18.8267,
+        "lon": 74.3779,
+        "aliases": [
+          "शिरूर"
+        ]
+      },
+      {
+        "name": "Daund",
+        "lat": 18.4658,
+        "lon": 74.5807,
+        "aliases": [
+          "दौंड"
+        ]
+      },
+      {
+        "name": "Junnar",
+        "lat": 19.2081,
+        "lon": 73.8761,
+        "aliases": [
+          "जुन्नर"
+        ]
+      },
+      {
+        "name": "Indapur",
+        "lat": 18.1158,
+        "lon": 75.0294,
+        "aliases": [
+          "इंदापूर"
+        ]
+      },
+      {
+        "name": "Maval",
+        "lat": 18.7522,
+        "lon": 73.5594,
+        "aliases": [
+          "मावळ",
+          "Talegaon",
+          "Lonavala"
+        ]
+      }
+    ]
   },
   {
     "district_id": "533",
@@ -19,7 +85,31 @@
     "lat": 19.076,
     "lon": 72.8777,
     "imd_station_id": "43003",
-    "aliases": ["Bombay", "Mumbai", "मुंबई"]
+    "agro_zone": "Konkan Coastal Zone",
+    "aliases": [
+      "Bombay",
+      "Mumbai",
+      "मुंबई",
+      "Colaba"
+    ],
+    "tehsils": [
+      {
+        "name": "Colaba",
+        "lat": 18.9067,
+        "lon": 72.8147,
+        "aliases": [
+          "कुलाबा"
+        ]
+      },
+      {
+        "name": "Dadar",
+        "lat": 19.0178,
+        "lon": 72.8478,
+        "aliases": [
+          "दादर"
+        ]
+      }
+    ]
   },
   {
     "district_id": "534",
@@ -30,7 +120,40 @@
     "lat": 19.2173,
     "lon": 72.8479,
     "imd_station_id": "43004",
-    "aliases": ["Andheri", "Bandra"]
+    "agro_zone": "Konkan Coastal Zone",
+    "aliases": [
+      "Andheri",
+      "Bandra",
+      "Santacruz",
+      "Borivali",
+      "Kurla"
+    ],
+    "tehsils": [
+      {
+        "name": "Andheri",
+        "lat": 19.1136,
+        "lon": 72.8697,
+        "aliases": [
+          "अंधेरी"
+        ]
+      },
+      {
+        "name": "Bandra",
+        "lat": 19.0596,
+        "lon": 72.8295,
+        "aliases": [
+          "वांद्रे"
+        ]
+      },
+      {
+        "name": "Borivali",
+        "lat": 19.2307,
+        "lon": 72.8567,
+        "aliases": [
+          "बोरिवली"
+        ]
+      }
+    ]
   },
   {
     "district_id": "535",
@@ -41,40 +164,38 @@
     "lat": 19.2183,
     "lon": 72.9781,
     "imd_station_id": "43005",
-    "aliases": ["Thana", "Thane Creek"]
-  },
-  {
-    "district_id": "441",
-    "district_name": "Chennai",
-    "state": "Tamil Nadu",
-    "state_code": "TN",
-    "coastal": true,
-    "lat": 13.0827,
-    "lon": 80.2707,
-    "imd_station_id": "43279",
-    "aliases": ["Madras", "Chennai area", "சென்னை"]
-  },
-  {
-    "district_id": "468",
-    "district_name": "Nagapattinam",
-    "state": "Tamil Nadu",
-    "state_code": "TN",
-    "coastal": true,
-    "lat": 10.7656,
-    "lon": 79.8436,
-    "imd_station_id": "43346",
-    "aliases": ["Nagapatinam", "Nagai"]
-  },
-  {
-    "district_id": "453",
-    "district_name": "Rameswaram",
-    "state": "Tamil Nadu",
-    "state_code": "TN",
-    "coastal": true,
-    "lat": 9.2876,
-    "lon": 79.3129,
-    "imd_station_id": "43359",
-    "aliases": ["Rameshwaram", "Pamban"]
+    "agro_zone": "North Konkan Coastal Zone",
+    "aliases": [
+      "Thana",
+      "Thane Creek",
+      "ठाणे"
+    ],
+    "tehsils": [
+      {
+        "name": "Kalyan",
+        "lat": 19.2437,
+        "lon": 73.1355,
+        "aliases": [
+          "कल्याण"
+        ]
+      },
+      {
+        "name": "Bhiwandi",
+        "lat": 19.3002,
+        "lon": 73.0635,
+        "aliases": [
+          "भिवंडी"
+        ]
+      },
+      {
+        "name": "Ulhasnagar",
+        "lat": 19.2215,
+        "lon": 73.1645,
+        "aliases": [
+          "उल्हासनगर"
+        ]
+      }
+    ]
   },
   {
     "district_id": "629",
@@ -85,18 +206,286 @@
     "lat": 21.1458,
     "lon": 79.0882,
     "imd_station_id": "42867",
-    "aliases": ["Nagapore", "नागपूर"]
+    "agro_zone": "Eastern Vidarbha Zone",
+    "aliases": [
+      "Nagapore",
+      "नागपूर",
+      "Orange City"
+    ],
+    "tehsils": [
+      {
+        "name": "Katol",
+        "lat": 21.2728,
+        "lon": 78.5862,
+        "aliases": [
+          "काटोल"
+        ]
+      },
+      {
+        "name": "Saoner",
+        "lat": 21.3855,
+        "lon": 78.9174,
+        "aliases": [
+          "सावनेर"
+        ]
+      },
+      {
+        "name": "Ramtek",
+        "lat": 21.3976,
+        "lon": 79.3292,
+        "aliases": [
+          "रामटेक"
+        ]
+      }
+    ]
   },
   {
-    "district_id": "123",
-    "district_name": "Puri",
-    "state": "Odisha",
-    "state_code": "OD",
+    "district_id": "516",
+    "district_name": "Nashik",
+    "state": "Maharashtra",
+    "state_code": "MH",
+    "coastal": false,
+    "lat": 19.9975,
+    "lon": 73.7898,
+    "imd_station_id": "43014",
+    "agro_zone": "Western Ghat & Plain Zone",
+    "aliases": [
+      "Nasik",
+      "नाशिक"
+    ],
+    "tehsils": [
+      {
+        "name": "Niphad",
+        "lat": 20.0833,
+        "lon": 74.1167,
+        "aliases": [
+          "निफाड",
+          "Lasalgaon",
+          "लासलगाव"
+        ]
+      },
+      {
+        "name": "Malegaon",
+        "lat": 20.5539,
+        "lon": 74.5262,
+        "aliases": [
+          "मालेगाव"
+        ]
+      },
+      {
+        "name": "Sinnar",
+        "lat": 19.8519,
+        "lon": 74.0044,
+        "aliases": [
+          "सिन्नर"
+        ]
+      },
+      {
+        "name": "Dindori",
+        "lat": 20.2014,
+        "lon": 73.8344,
+        "aliases": [
+          "दिंडोरी"
+        ]
+      }
+    ]
+  },
+  {
+    "district_id": "515",
+    "district_name": "Chhatrapati Sambhajinagar",
+    "state": "Maharashtra",
+    "state_code": "MH",
+    "coastal": false,
+    "lat": 19.8762,
+    "lon": 75.3433,
+    "imd_station_id": "43026",
+    "agro_zone": "Central Maharashtra Plateau",
+    "aliases": [
+      "Aurangabad",
+      "औरंगाबाद",
+      "छत्रपती संभाजीनगर"
+    ],
+    "tehsils": [
+      {
+        "name": "Paithan",
+        "lat": 19.48,
+        "lon": 75.38,
+        "aliases": [
+          "पैठण"
+        ]
+      },
+      {
+        "name": "Gangapur",
+        "lat": 19.7,
+        "lon": 75.01,
+        "aliases": [
+          "गंगापूर"
+        ]
+      }
+    ]
+  },
+  {
+    "district_id": "520",
+    "district_name": "Ratnagiri",
+    "state": "Maharashtra",
+    "state_code": "MH",
     "coastal": true,
-    "lat": 19.8135,
-    "lon": 85.8312,
-    "imd_station_id": "42976",
-    "aliases": ["Jagannath Puri"]
+    "lat": 16.9902,
+    "lon": 73.312,
+    "imd_station_id": "43110",
+    "agro_zone": "South Konkan Coastal Zone",
+    "aliases": [
+      "रत्नागिरी",
+      "Alphonso Hub"
+    ],
+    "tehsils": [
+      {
+        "name": "Chiplun",
+        "lat": 17.5323,
+        "lon": 73.5178,
+        "aliases": [
+          "चिपळूण"
+        ]
+      },
+      {
+        "name": "Guhagar",
+        "lat": 17.4833,
+        "lon": 73.1833,
+        "aliases": [
+          "गुहागर"
+        ]
+      },
+      {
+        "name": "Dapoli",
+        "lat": 17.7554,
+        "lon": 73.1856,
+        "aliases": [
+          "दापोली"
+        ]
+      }
+    ]
+  },
+  {
+    "district_id": "441",
+    "district_name": "Chennai",
+    "state": "Tamil Nadu",
+    "state_code": "TN",
+    "coastal": true,
+    "lat": 13.0827,
+    "lon": 80.2707,
+    "imd_station_id": "43279",
+    "agro_zone": "North Eastern Coastal Zone",
+    "aliases": [
+      "Madras",
+      "Chennai area",
+      "சென்னை",
+      "Meenambakkam",
+      "Nungambakkam"
+    ],
+    "tehsils": [
+      {
+        "name": "Tambaram",
+        "lat": 12.9249,
+        "lon": 80.1,
+        "aliases": [
+          "தாம்பரம்"
+        ]
+      },
+      {
+        "name": "Ambattur",
+        "lat": 13.1143,
+        "lon": 80.1548,
+        "aliases": [
+          "அம்பத்தூர்"
+        ]
+      },
+      {
+        "name": "Mylapore",
+        "lat": 13.0368,
+        "lon": 80.2676,
+        "aliases": [
+          "மயிலாப்பூர்"
+        ]
+      }
+    ]
+  },
+  {
+    "district_id": "468",
+    "district_name": "Nagapattinam",
+    "state": "Tamil Nadu",
+    "state_code": "TN",
+    "coastal": true,
+    "lat": 10.7656,
+    "lon": 79.8436,
+    "imd_station_id": "43346",
+    "agro_zone": "Cauvery Delta Coastal Zone",
+    "aliases": [
+      "Nagapatinam",
+      "Nagai",
+      "நாகப்பட்டினம்"
+    ],
+    "tehsils": [
+      {
+        "name": "Vedaranyam",
+        "lat": 10.3736,
+        "lon": 79.8519,
+        "aliases": [
+          "வேதாரண்யம்",
+          "Point Calimere"
+        ]
+      },
+      {
+        "name": "Kilvelur",
+        "lat": 10.7065,
+        "lon": 79.742,
+        "aliases": [
+          "கீழ்வேளூர்"
+        ]
+      }
+    ]
+  },
+  {
+    "district_id": "453",
+    "district_name": "Rameswaram",
+    "state": "Tamil Nadu",
+    "state_code": "TN",
+    "coastal": true,
+    "lat": 9.2876,
+    "lon": 79.3129,
+    "imd_station_id": "43359",
+    "agro_zone": "Southern Coastal Zone",
+    "aliases": [
+      "Rameshwaram",
+      "Pamban",
+      "இராமேஸ்வரம்",
+      "Ramanathapuram"
+    ],
+    "tehsils": [
+      {
+        "name": "Pamban",
+        "lat": 9.2789,
+        "lon": 79.2069,
+        "aliases": [
+          "பாம்பன்"
+        ]
+      },
+      {
+        "name": "Dhanushkodi",
+        "lat": 9.1783,
+        "lon": 79.4144,
+        "aliases": [
+          "தனுஷ்கோடி"
+        ]
+      },
+      {
+        "name": "Mandapam",
+        "lat": 9.2796,
+        "lon": 79.1239,
+        "aliases": [
+          "மண்டபம்"
+        ]
+      }
+    ]
   },
   {
     "district_id": "211",
@@ -107,6 +496,707 @@
     "lat": 10.787,
     "lon": 79.1378,
     "imd_station_id": "43330",
-    "aliases": ["Tanjore", "Thanjai"]
+    "agro_zone": "Cauvery Delta Rice Zone",
+    "aliases": [
+      "Tanjore",
+      "Thanjai",
+      "தஞ்சாவூர்",
+      "Rice Bowl of TN"
+    ],
+    "tehsils": [
+      {
+        "name": "Kumbakonam",
+        "lat": 10.9602,
+        "lon": 79.3845,
+        "aliases": [
+          "கும்பகோணம்"
+        ]
+      },
+      {
+        "name": "Papanasam",
+        "lat": 10.9234,
+        "lon": 79.2778,
+        "aliases": [
+          "பாபநாசம்"
+        ]
+      }
+    ]
+  },
+  {
+    "district_id": "449",
+    "district_name": "Cuddalore",
+    "state": "Tamil Nadu",
+    "state_code": "TN",
+    "coastal": true,
+    "lat": 11.748,
+    "lon": 79.7714,
+    "imd_station_id": "43329",
+    "agro_zone": "North Eastern Coastal Zone",
+    "aliases": [
+      "கடலூர்",
+      "Chidambaram"
+    ],
+    "tehsils": [
+      {
+        "name": "Chidambaram",
+        "lat": 11.3992,
+        "lon": 79.6936,
+        "aliases": [
+          "சிதம்பரம்"
+        ]
+      },
+      {
+        "name": "Panruti",
+        "lat": 11.7711,
+        "lon": 79.5536,
+        "aliases": [
+          "பண்ருட்டி"
+        ]
+      }
+    ]
+  },
+  {
+    "district_id": "456",
+    "district_name": "Kanyakumari",
+    "state": "Tamil Nadu",
+    "state_code": "TN",
+    "coastal": true,
+    "lat": 8.0883,
+    "lon": 77.5385,
+    "imd_station_id": "43371",
+    "agro_zone": "High Rainfall Coastal Zone",
+    "aliases": [
+      "Cape Comorin",
+      "கன்னியாகுமரி",
+      "Nagercoil"
+    ],
+    "tehsils": [
+      {
+        "name": "Nagercoil",
+        "lat": 8.1833,
+        "lon": 77.4119,
+        "aliases": [
+          "நாகர்கோவில்"
+        ]
+      },
+      {
+        "name": "Colachel",
+        "lat": 8.175,
+        "lon": 77.2567,
+        "aliases": [
+          "குளச்சல்"
+        ]
+      }
+    ]
+  },
+  {
+    "district_id": "123",
+    "district_name": "Puri",
+    "state": "Odisha",
+    "state_code": "OD",
+    "coastal": true,
+    "lat": 19.8135,
+    "lon": 85.8312,
+    "imd_station_id": "42976",
+    "agro_zone": "East Coast Plain Zone",
+    "aliases": [
+      "Jagannath Puri",
+      "ପୁରୀ"
+    ],
+    "tehsils": [
+      {
+        "name": "Konark",
+        "lat": 19.8876,
+        "lon": 86.0945,
+        "aliases": [
+          "କୋଣାର୍କ"
+        ]
+      },
+      {
+        "name": "Brahmagiri",
+        "lat": 19.8,
+        "lon": 85.6333,
+        "aliases": [
+          "ବ୍ରହ୍ମଗିରି"
+        ]
+      },
+      {
+        "name": "Astaranga",
+        "lat": 19.9833,
+        "lon": 86.2667,
+        "aliases": [
+          "ଅସ୍ତରଙ୍ଗ"
+        ]
+      }
+    ]
+  },
+  {
+    "district_id": "118",
+    "district_name": "Jagatsinghpur",
+    "state": "Odisha",
+    "state_code": "OD",
+    "coastal": true,
+    "lat": 20.2588,
+    "lon": 86.1706,
+    "imd_station_id": "42978",
+    "agro_zone": "North Eastern Coastal Plain",
+    "aliases": [
+      "Paradeep",
+      "Paradip",
+      "ଜଗତସିଂହପୁର",
+      "ପାରାଦ୍ୱୀପ"
+    ],
+    "tehsils": [
+      {
+        "name": "Paradeep",
+        "lat": 20.316,
+        "lon": 86.611,
+        "aliases": [
+          "Paradip Port",
+          "ପାରାଦ୍ୱୀପ"
+        ]
+      },
+      {
+        "name": "Kujang",
+        "lat": 20.3,
+        "lon": 86.5333,
+        "aliases": [
+          "କୁଜଙ୍ଗ"
+        ]
+      }
+    ]
+  },
+  {
+    "district_id": "111",
+    "district_name": "Balasore",
+    "state": "Odisha",
+    "state_code": "OD",
+    "coastal": true,
+    "lat": 21.4934,
+    "lon": 86.9135,
+    "imd_station_id": "42895",
+    "agro_zone": "North Eastern Coastal Plain",
+    "aliases": [
+      "Baleswar",
+      "ବାଲେଶ୍ୱର",
+      "Chandipur"
+    ],
+    "tehsils": [
+      {
+        "name": "Chandipur",
+        "lat": 21.47,
+        "lon": 87.02,
+        "aliases": [
+          "ଚାନ୍ଦିପୁର"
+        ]
+      },
+      {
+        "name": "Jaleswar",
+        "lat": 21.8,
+        "lon": 87.2167,
+        "aliases": [
+          "ଜଳେଶ୍ୱର"
+        ]
+      }
+    ]
+  },
+  {
+    "district_id": "301",
+    "district_name": "Ahmedabad",
+    "state": "Gujarat",
+    "state_code": "GJ",
+    "coastal": false,
+    "lat": 23.0225,
+    "lon": 72.5714,
+    "imd_station_id": "42647",
+    "agro_zone": "North West Zone Gujarat",
+    "aliases": [
+      "Amdavad",
+      "અમદાવાદ"
+    ],
+    "tehsils": [
+      {
+        "name": "Sanand",
+        "lat": 22.9833,
+        "lon": 72.3833,
+        "aliases": [
+          "સાણંદ"
+        ]
+      },
+      {
+        "name": "Dholka",
+        "lat": 22.72,
+        "lon": 72.46,
+        "aliases": [
+          "ધોળકા"
+        ]
+      }
+    ]
+  },
+  {
+    "district_id": "315",
+    "district_name": "Gir Somnath",
+    "state": "Gujarat",
+    "state_code": "GJ",
+    "coastal": true,
+    "lat": 20.9,
+    "lon": 70.3667,
+    "imd_station_id": "42909",
+    "agro_zone": "South Saurashtra Coastal Zone",
+    "aliases": [
+      "Veraval",
+      "Somnath",
+      "ગીર સોમનાથ",
+      "વેરાવળ"
+    ],
+    "tehsils": [
+      {
+        "name": "Veraval",
+        "lat": 20.9067,
+        "lon": 70.3686,
+        "aliases": [
+          "Veraval Port",
+          "વેરાવળ"
+        ]
+      },
+      {
+        "name": "Kodinar",
+        "lat": 20.7833,
+        "lon": 70.7,
+        "aliases": [
+          "કોડીનાર"
+        ]
+      }
+    ]
+  },
+  {
+    "district_id": "308",
+    "district_name": "Surat",
+    "state": "Gujarat",
+    "state_code": "GJ",
+    "coastal": true,
+    "lat": 21.1702,
+    "lon": 72.8311,
+    "imd_station_id": "42840",
+    "agro_zone": "South Gujarat Heavy Rainfall Zone",
+    "aliases": [
+      "સુરત",
+      "Diamond City"
+    ],
+    "tehsils": [
+      {
+        "name": "Choryasi",
+        "lat": 21.17,
+        "lon": 72.8,
+        "aliases": [
+          "ચોર્યાસી"
+        ]
+      },
+      {
+        "name": "Bardoli",
+        "lat": 21.12,
+        "lon": 73.11,
+        "aliases": [
+          "બારડોલી"
+        ]
+      }
+    ]
+  },
+  {
+    "district_id": "701",
+    "district_name": "Visakhapatnam",
+    "state": "Andhra Pradesh",
+    "state_code": "AP",
+    "coastal": true,
+    "lat": 17.6868,
+    "lon": 83.2185,
+    "imd_station_id": "43149",
+    "agro_zone": "North Coastal Andhra Zone",
+    "aliases": [
+      "Vizag",
+      "Waltair",
+      "విశాఖపట్నం"
+    ],
+    "tehsils": [
+      {
+        "name": "Gajuwaka",
+        "lat": 17.69,
+        "lon": 83.18,
+        "aliases": [
+          "గాజువాక"
+        ]
+      },
+      {
+        "name": "Anakapalle",
+        "lat": 17.6913,
+        "lon": 83.0039,
+        "aliases": [
+          "అనకాపల్లి"
+        ]
+      },
+      {
+        "name": "Bheemunipatnam",
+        "lat": 17.89,
+        "lon": 83.45,
+        "aliases": [
+          "Bheemili"
+        ]
+      }
+    ]
+  },
+  {
+    "district_id": "705",
+    "district_name": "Kakinada",
+    "state": "Andhra Pradesh",
+    "state_code": "AP",
+    "coastal": true,
+    "lat": 16.9891,
+    "lon": 82.2475,
+    "imd_station_id": "43189",
+    "agro_zone": "Godavari Delta Coastal Zone",
+    "aliases": [
+      "East Godavari",
+      "కాకినాడ",
+      "Kakinada Port"
+    ],
+    "tehsils": [
+      {
+        "name": "Samalkota",
+        "lat": 17.05,
+        "lon": 82.1667,
+        "aliases": [
+          "సామర్లకోట"
+        ]
+      },
+      {
+        "name": "Peddapuram",
+        "lat": 17.08,
+        "lon": 82.13,
+        "aliases": [
+          "పెద్దాపురం"
+        ]
+      }
+    ]
+  },
+  {
+    "district_id": "801",
+    "district_name": "Ernakulam",
+    "state": "Kerala",
+    "state_code": "KL",
+    "coastal": true,
+    "lat": 9.9816,
+    "lon": 76.2999,
+    "imd_station_id": "43351",
+    "agro_zone": "Central Coastal Plain Kerala",
+    "aliases": [
+      "Cochin",
+      "Kochi",
+      "എറണാകുളം",
+      "കൊച്ചി"
+    ],
+    "tehsils": [
+      {
+        "name": "Kochi",
+        "lat": 9.9312,
+        "lon": 76.2673,
+        "aliases": [
+          "കൊച്ചി"
+        ]
+      },
+      {
+        "name": "Aluva",
+        "lat": 10.1076,
+        "lon": 76.3516,
+        "aliases": [
+          "ആലുവ"
+        ]
+      }
+    ]
+  },
+  {
+    "district_id": "802",
+    "district_name": "Thiruvananthapuram",
+    "state": "Kerala",
+    "state_code": "KL",
+    "coastal": true,
+    "lat": 8.5241,
+    "lon": 76.9366,
+    "imd_station_id": "43371",
+    "agro_zone": "Southern Coastal Plain",
+    "aliases": [
+      "Trivandrum",
+      "തിരുവനന്തപുരം",
+      "Vizhinjam"
+    ],
+    "tehsils": [
+      {
+        "name": "Vizhinjam",
+        "lat": 8.38,
+        "lon": 76.99,
+        "aliases": [
+          "വിഴിഞ്ഞം",
+          "Vizhinjam Port"
+        ]
+      },
+      {
+        "name": "Neyyattinkara",
+        "lat": 8.4,
+        "lon": 77.08,
+        "aliases": [
+          "നെയ്യാറ്റിൻകര"
+        ]
+      }
+    ]
+  },
+  {
+    "district_id": "901",
+    "district_name": "Kolkata",
+    "state": "West Bengal",
+    "state_code": "WB",
+    "coastal": false,
+    "lat": 22.5726,
+    "lon": 88.3639,
+    "imd_station_id": "42809",
+    "agro_zone": "Gangetic Alluvial Zone",
+    "aliases": [
+      "Calcutta",
+      "কলকাতা",
+      "Alipore",
+      "Dum Dum"
+    ],
+    "tehsils": [
+      {
+        "name": "Alipore",
+        "lat": 22.5333,
+        "lon": 88.3333,
+        "aliases": [
+          "আলিপুর"
+        ]
+      },
+      {
+        "name": "Dumdum",
+        "lat": 22.65,
+        "lon": 88.42,
+        "aliases": [
+          "দমদম"
+        ]
+      }
+    ]
+  },
+  {
+    "district_id": "902",
+    "district_name": "South 24 Parganas",
+    "state": "West Bengal",
+    "state_code": "WB",
+    "coastal": true,
+    "lat": 22.1352,
+    "lon": 88.5492,
+    "imd_station_id": "42810",
+    "agro_zone": "Coastal Saline Zone Sundarbans",
+    "aliases": [
+      "Sundarbans",
+      "দক্ষিণ চব্বিশ পরগনা",
+      "Kakdwip",
+      "Sagar Island"
+    ],
+    "tehsils": [
+      {
+        "name": "Kakdwip",
+        "lat": 21.8764,
+        "lon": 88.1856,
+        "aliases": [
+          "কাকদ্বীপ"
+        ]
+      },
+      {
+        "name": "Namkhana",
+        "lat": 21.7667,
+        "lon": 88.2333,
+        "aliases": [
+          "নামখানা"
+        ]
+      },
+      {
+        "name": "Sagar",
+        "lat": 21.65,
+        "lon": 88.08,
+        "aliases": [
+          "সাগর দ্বীপ",
+          "Gangasagar"
+        ]
+      }
+    ]
+  },
+  {
+    "district_id": "101",
+    "district_name": "Ludhiana",
+    "state": "Punjab",
+    "state_code": "PB",
+    "coastal": false,
+    "lat": 30.901,
+    "lon": 75.8573,
+    "imd_station_id": "42099",
+    "agro_zone": "Central Plain Zone Punjab",
+    "aliases": [
+      "ਲੁਧਿਆਣਾ",
+      "PAU Hub"
+    ],
+    "tehsils": [
+      {
+        "name": "Jagraon",
+        "lat": 30.78,
+        "lon": 75.48,
+        "aliases": [
+          "ਜਗਰਾਓਂ"
+        ]
+      },
+      {
+        "name": "Khanna",
+        "lat": 30.7,
+        "lon": 76.22,
+        "aliases": [
+          "ਖੰਨਾ"
+        ]
+      }
+    ]
+  },
+  {
+    "district_id": "102",
+    "district_name": "Karnal",
+    "state": "Haryana",
+    "state_code": "HR",
+    "coastal": false,
+    "lat": 29.6857,
+    "lon": 76.9905,
+    "imd_station_id": "42131",
+    "agro_zone": "Eastern Plain Zone Haryana",
+    "aliases": [
+      "करनाल",
+      "NDRI Hub",
+      "Rice City"
+    ],
+    "tehsils": [
+      {
+        "name": "Assandh",
+        "lat": 29.52,
+        "lon": 76.6,
+        "aliases": [
+          "असंध"
+        ]
+      },
+      {
+        "name": "Gharaunda",
+        "lat": 29.54,
+        "lon": 76.97,
+        "aliases": [
+          "घरौंडा"
+        ]
+      }
+    ]
+  },
+  {
+    "district_id": "103",
+    "district_name": "Varanasi",
+    "state": "Uttar Pradesh",
+    "state_code": "UP",
+    "coastal": false,
+    "lat": 25.3176,
+    "lon": 82.9739,
+    "imd_station_id": "42475",
+    "agro_zone": "Eastern Plain Zone UP",
+    "aliases": [
+      "Banaras",
+      "Kashi",
+      "बनारस",
+      "वाराणसी",
+      "काशी"
+    ],
+    "tehsils": [
+      {
+        "name": "Pindra",
+        "lat": 25.48,
+        "lon": 82.85,
+        "aliases": [
+          "पिंडरा"
+        ]
+      },
+      {
+        "name": "Rohania",
+        "lat": 25.27,
+        "lon": 82.92,
+        "aliases": [
+          "रोहनिया"
+        ]
+      }
+    ]
+  },
+  {
+    "district_id": "104",
+    "district_name": "Patna",
+    "state": "Bihar",
+    "state_code": "BR",
+    "coastal": false,
+    "lat": 25.5941,
+    "lon": 85.1376,
+    "imd_station_id": "42492",
+    "agro_zone": "South Bihar Alluvial Plain",
+    "aliases": [
+      "पटना",
+      "Pataliputra"
+    ],
+    "tehsils": [
+      {
+        "name": "Barh",
+        "lat": 25.48,
+        "lon": 85.71,
+        "aliases": [
+          "बाढ़"
+        ]
+      },
+      {
+        "name": "Mokama",
+        "lat": 25.4,
+        "lon": 85.92,
+        "aliases": [
+          "मोकामा"
+        ]
+      }
+    ]
+  },
+  {
+    "district_id": "105",
+    "district_name": "New Delhi",
+    "state": "Delhi",
+    "state_code": "DL",
+    "coastal": false,
+    "lat": 28.6139,
+    "lon": 77.209,
+    "imd_station_id": "42182",
+    "agro_zone": "Trans-Gangetic Plain",
+    "aliases": [
+      "Delhi",
+      "NCR",
+      "दिल्ली",
+      "Safdarjung",
+      "Palam"
+    ],
+    "tehsils": [
+      {
+        "name": "Palam",
+        "lat": 28.59,
+        "lon": 77.08,
+        "aliases": [
+          "पालम"
+        ]
+      },
+      {
+        "name": "Narela",
+        "lat": 28.85,
+        "lon": 77.09,
+        "aliases": [
+          "नरेला"
+        ]
+      }
+    ]
   }
 ]

@@ -56,6 +56,22 @@ def _build_choices() -> None:
             if alias_low not in _choice_to_district:
                 _choices.append(alias_low)
                 _choice_to_district[alias_low] = d
+        # Phase 1.1: Index tehsils / talukas for hyper-local sub-district resolution
+        for tehsil in d.get("tehsils", []):
+            t_name = tehsil["name"].lower()
+            t_obj = dict(d)
+            t_obj["tehsil"] = tehsil["name"]
+            if tehsil.get("lat") is not None and tehsil.get("lon") is not None:
+                t_obj["lat"] = tehsil["lat"]
+                t_obj["lon"] = tehsil["lon"]
+            if t_name not in _choice_to_district:
+                _choices.append(t_name)
+                _choice_to_district[t_name] = t_obj
+            for t_alias in tehsil.get("aliases", []):
+                t_alias_low = t_alias.lower()
+                if t_alias_low not in _choice_to_district:
+                    _choices.append(t_alias_low)
+                    _choice_to_district[t_alias_low] = t_obj
 
 def _normalize(text: str) -> str:
     t = text.strip().lower()
@@ -120,6 +136,8 @@ def fuzzy_match(location_text: str, threshold: int = 70) -> Dict[str, Any]:
             "district_id": top_district["district_id"],
             "district_name": top_district["district_name"],
             "state": top_district["state"],
+            "tehsil": top_district.get("tehsil"),
+            "agro_zone": top_district.get("agro_zone"),
             "confidence": int(top_score),
             "lat": top_district.get("lat"),
             "lon": top_district.get("lon"),
