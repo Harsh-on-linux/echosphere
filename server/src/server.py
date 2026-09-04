@@ -127,6 +127,8 @@ class StartAgentRequest(BaseModel):
     rtcUid: int
     userUid: int
     parameters: Optional[Dict[str, Any]] = None
+    language: Optional[str] = None
+    persona: Optional[str] = None
 
 
 class StopAgentRequest(BaseModel):
@@ -262,6 +264,8 @@ async def start_agent(request: StartAgentRequest):
             agent_uid=request.rtcUid,
             user_uid=request.userUid,
             output_audio_codec=output_audio_codec,
+            language=request.language,
+            persona=request.persona,
         )
         return {"code": 0, "msg": "success", "data": result}
     except Exception as e:

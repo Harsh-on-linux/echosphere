@@ -55,8 +55,15 @@ export async function getToken(options?: { channel?: string; uid?: string | numb
   return response.json()
 }
 
-export async function startAgent(channelName: string, rtcUid: number, userUid: number): Promise<string> {
-  const payload = { channelName, rtcUid, userUid }
+export async function startAgent(
+  channelName: string,
+  rtcUid: number,
+  userUid: number,
+  options?: { language?: string; persona?: string },
+): Promise<string> {
+  const payload: Record<string, unknown> = { channelName, rtcUid, userUid }
+  if (options?.language) payload.language = options.language
+  if (options?.persona) payload.persona = options.persona
 
   const response = await fetch(`${API_BASE_URL}/startAgent`, {
     method: 'POST',

@@ -45,6 +45,19 @@ test('startAgent posts the payload and returns agent_id', async () => {
   })
 })
 
+test('startAgent forwards language and persona options', async () => {
+  mockFetch(200, { code: 0, msg: 'success', data: { agent_id: 'agent-1' } })
+  const id = await startAgent('ch', 111, 222, { language: 'hi-IN', persona: 'farmer' })
+  expect(id).toBe('agent-1')
+  expect(JSON.parse(String(lastCall.init?.body))).toEqual({
+    channelName: 'ch',
+    rtcUid: 111,
+    userUid: 222,
+    language: 'hi-IN',
+    persona: 'farmer',
+  })
+})
+
 test('stopAgent posts the agentId', async () => {
   mockFetch(200, {})
   await stopAgent('agent-1')

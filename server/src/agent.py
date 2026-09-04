@@ -20,23 +20,31 @@ from agora_agent.agentkit.vendors import (
 
 try:
     from persona_prompt import (
+        DEFAULT_PERSONA,
         GREETINGS,
         INDIC_LANGUAGES,
+        PERSONA_TTS_RATE,
         SARVAM_SPEAKER,
         TURN_DETECTION_LANGUAGE,
         WEATHERGPT_SYSTEM,
         get_greeting,
+        get_system_prompt,
         normalize_language,
+        normalize_persona,
     )
 except ImportError:  # pragma: no cover - fallback when run from a different cwd
     from src.persona_prompt import (  # type: ignore
+        DEFAULT_PERSONA,
         GREETINGS,
         INDIC_LANGUAGES,
+        PERSONA_TTS_RATE,
         SARVAM_SPEAKER,
         TURN_DETECTION_LANGUAGE,
         WEATHERGPT_SYSTEM,
         get_greeting,
+        get_system_prompt,
         normalize_language,
+        normalize_persona,
     )
 
 logger = logging.getLogger("uvicorn.error")
@@ -106,6 +114,7 @@ class Agent:
         user_uid: int,
         output_audio_codec: Optional[str] = None,
         language: Optional[str] = None,
+        persona: Optional[str] = None,
     ) -> Dict[str, Any]:
         """Start agent with the same default vendor chain as the Next.js quickstart."""
         if not channel_name or not str(channel_name).strip():
@@ -126,6 +135,10 @@ class Agent:
         use_sarvam = (voice_language in INDIC_LANGUAGES or voice_language == "auto") and bool(sarvam_key)
         greeting = get_greeting(voice_language)
         turn_language = TURN_DETECTION_LANGUAGE.get(voice_language, "en-US")
+        # Phase 4.2 — persona hint selects the system prompt + TTS rate.
+        voice_persona = normalize_persona(persona)
+        instructions = get_system_prompt(voice_persona)
+        tts_rate = PERSONA_TTS_RATE.get(voice_persona, 1.0)
 
         # Default managed path: DeepgramSTT + OpenAI + MiniMaxTTS (plan.md 2.1).
         # Managed = included in the $0.10/min Conv AI price, inside 300 free mins.
@@ -134,7 +147,7 @@ class Agent:
         mcp_servers = get_mcp_servers()
         llm_kwargs: Dict[str, Any] = dict(
             model="gpt-4o-mini",
-            system_messages=[{"role": "system", "content": WEATHERGPT_SYSTEM}],
+            system_messages=[{"role": "system", "content": instructions}],
             greeting_message=greeting,
             failure_message=self.failure_message,
             max_history=WEATHERGPT_MAX_HISTORY,
@@ -150,11 +163,12 @@ class Agent:
             tts_language = "en-IN" if voice_language == "auto" else voice_language
             stt = SarvamSTT(api_key=sarvam_key, language=stt_language)
             tts = SarvamTTS(key=sarvam_key, speaker=SARVAM_SPEAKER,
-                            target_language_code=tts_language)
+                            target_language_code=tts_language, pace=tts_rate)
             stt_name, tts_name = "sarvam", "sarvam"
         else:
             stt = DeepgramSTT(model="nova-3", language="en")
-            tts = MiniMaxTTS(model="speech_2_6_turbo", voice_id="English_captivating_female1")
+            tts = MiniMaxTTS(model="speech_2_6_turbo", voice_id="English_captivating_female1",
+                             speed=tts_rate)
             stt_name, tts_name = "deepgram", "minimax"
 
         # Optional BYOK example: replace the STT block above and set DEEPGRAM_API_KEY.
@@ -191,7 +205,7 @@ class Agent:
 
         agora_agent = AgoraAgent(
             client=self.client,
-            instructions=WEATHERGPT_SYSTEM,
+            instructions=instructions,
             greeting=greeting,
             failure_message=self.failure_message,
             max_history=WEATHERGPT_MAX_HISTORY,
@@ -271,6 +285,7 @@ class Agent:
             "channel_name": channel_name,
             "status": "started",
             "language": voice_language,
+            "persona": voice_persona,
             "stt": stt_name,
             "tts": tts_name,
         }

@@ -36,7 +36,17 @@ def test_start_agent_calls_agent_and_returns_shape(client):
         "channel_name": "ch",
         "status": "started",
     }
-    assert client.fake_agent.started == [("ch", 111, 222, None)]
+    assert client.fake_agent.started == [("ch", 111, 222, None, None, None)]
+
+
+def test_start_agent_forwards_language_and_persona(client):
+    response = client.post(
+        "/startAgent",
+        json={"channelName": "ch", "rtcUid": 111, "userUid": 222,
+              "language": "hi-IN", "persona": "farmer"},
+    )
+    assert response.status_code == 200
+    assert client.fake_agent.started[-1] == ("ch", 111, 222, None, "hi-IN", "farmer")
 
 
 def test_start_agent_forwards_output_audio_codec(client):
@@ -49,7 +59,7 @@ def test_start_agent_forwards_output_audio_codec(client):
             "parameters": {"output_audio_codec": "opus"},
         },
     )
-    assert client.fake_agent.started[-1] == ("ch", 111, 222, "opus")
+    assert client.fake_agent.started[-1] == ("ch", 111, 222, "opus", None, None)
 
 
 def test_stop_agent(client):

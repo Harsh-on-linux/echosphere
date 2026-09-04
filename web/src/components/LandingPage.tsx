@@ -9,6 +9,7 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { LoadingSkeleton } from "@/components/LoadingSkeleton";
 import { QuickstartPreCallCard } from "@/components/QuickstartPreCallCard";
 import { VoiceSettingsPanel } from "@/components/VoiceSettingsPanel";
+import type { VoiceSettings } from "@/components/VoiceSettingsPanel";
 import { ShareButton } from "@/components/share-button";
 import { getConfig, startAgent, stopAgent } from "@/services/api";
 import type { AgoraRenewalTokens, AgoraTokenData } from "@/types/conversation";
@@ -94,6 +95,8 @@ export default function LandingPage() {
 	const [isLoading, setIsLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const [agentJoinError, setAgentJoinError] = useState(false);
+	// Phase 4.2: pre-call voice preference -> startAgent language/persona.
+	const [voiceSettings, setVoiceSettings] = useState<VoiceSettings | null>(null);
 
 	useEffect(() => {
 		import("agora-rtc-react").catch(() => {});
@@ -133,6 +136,10 @@ export default function LandingPage() {
 					config.channel_name,
 					Number(config.agent_uid),
 					Number(config.uid),
+					{
+						language: voiceSettings?.asrLanguage,
+						persona: voiceSettings?.persona,
+					},
 				).catch((err) => {
 					console.error("Failed to start conversation with agent:", err);
 					setAgentJoinError(true);
@@ -231,7 +238,7 @@ export default function LandingPage() {
 								error={error}
 								onStartConversation={handleStartConversation}
 							/>
-							<VoiceSettingsPanel />
+							<VoiceSettingsPanel onChange={setVoiceSettings} />
 						</div>
 					) : agoraData && rtmClient ? (
 						<>

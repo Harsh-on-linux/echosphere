@@ -15,36 +15,51 @@ const TTS_VOICES = [
   { value: "anushka", label: "Sarvam Anushka (Indic, Phase 4)" },
 ] as const;
 
+const PERSONAS = [
+  { value: "general", label: "General" },
+  { value: "farmer", label: "Farmer (rain/sowing)" },
+  { value: "fisherman", label: "Fisherman (sea safety)" },
+  { value: "disaster", label: "Disaster manager" },
+] as const;
+
 const STORAGE_KEY = "weathergpt.voice-settings";
 
 export type VoiceSettings = {
   asrLanguage: string;
   ttsVoice: string;
+  persona: string;
+};
+
+const DEFAULT_SETTINGS: VoiceSettings = {
+  asrLanguage: "en-IN",
+  ttsVoice: TTS_VOICES[0].value,
+  persona: "general",
 };
 
 function loadSettings(): VoiceSettings {
   if (typeof window === "undefined") {
-    return { asrLanguage: "en-IN", ttsVoice: TTS_VOICES[0].value };
+    return { ...DEFAULT_SETTINGS };
   }
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
     if (raw) {
       const parsed = JSON.parse(raw) as Partial<VoiceSettings>;
       return {
-        asrLanguage: parsed.asrLanguage ?? "en-IN",
-        ttsVoice: parsed.ttsVoice ?? TTS_VOICES[0].value,
+        asrLanguage: parsed.asrLanguage ?? DEFAULT_SETTINGS.asrLanguage,
+        ttsVoice: parsed.ttsVoice ?? DEFAULT_SETTINGS.ttsVoice,
+        persona: parsed.persona ?? DEFAULT_SETTINGS.persona,
       };
     }
   } catch {
     // Corrupt storage: fall through to defaults.
   }
-  return { asrLanguage: "en-IN", ttsVoice: TTS_VOICES[0].value };
+  return { ...DEFAULT_SETTINGS };
 }
 
 /**
- * VoiceSettingsPanel — switch ASR language / TTS voice (plan.md 2.2).
- * Phase 2 stores the pre-call preference; Phase 4 applies it live via
- * Sarvam BYOK without restarting the channel.
+ * VoiceSettingsPanel — switch ASR language / TTS voice / persona (plan.md 2.2, 4.2).
+ * Phase 4 sends the pre-call preference with startAgent: Indic languages use
+ * Sarvam BYOK when the server has a key, else the managed English loop.
  */
 export function VoiceSettingsPanel({
   onChange,
@@ -104,9 +119,26 @@ export function VoiceSettingsPanel({
           ))}
         </select>
       </label>
+      <label className="flex flex-col gap-1 text-xs font-medium text-muted-foreground">
+        Persona
+        <select
+          className="h-9 rounded-md border border-border bg-background px-2 text-sm text-foreground"
+          value={settings.persona}
+          onChange={(event) =>
+            setSettings((prev) => ({ ...prev, persona: event.target.value }))
+          }
+          aria-label="Persona"
+        >
+          {PERSONAS.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+      </label>
       <p className="text-[11px] leading-4 text-muted-foreground">
-        Phase 2 runs the managed English loop. Indic voices activate in Phase 4
-        via Sarvam BYOK.
+        Indic languages use Sarvam BYOK when the server has a key, else the
+        managed English loop. Persona tunes the prompt and speech rate.
       </p>
     </fieldset>
   );
