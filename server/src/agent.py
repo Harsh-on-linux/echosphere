@@ -32,6 +32,25 @@ WEATHERGPT_MAX_HISTORY = 10
 WEATHERGPT_IDLE_TIMEOUT = 120
 
 
+def get_mcp_servers() -> Optional[list]:
+    """Build llm.mcp_servers for Agora (plan.md 3.3, research.md #6).
+
+    Agora calls POST {url} (JSON-RPC) when the LLM decides to use an IMD tool.
+    URL must be public HTTPS in prod (plan.md 6.1); localhost works for tests
+    to verify config shape. Returns None when unconfigured so managed-only
+    sessions stay byte-identical to Phase 2.
+    """
+    explicit = (os.getenv("MCP_SERVER_URL") or "").strip()
+    if explicit:
+        url = explicit
+    else:
+        backend = (os.getenv("BACKEND_URL") or "").strip().rstrip("/")
+        if not backend:
+            return None
+        url = f"{backend}/mcp"
+    return [{"url": url, "transport": "streamable_http", "name": "imd"}]
+
+
 class Agent:
     """
     High-level wrapper for Agora Conversational AI Agent operations.
@@ -75,7 +94,10 @@ class Agent:
 
         # Default managed path: DeepgramSTT + OpenAI + MiniMaxTTS (plan.md 2.1).
         # Managed = included in the $0.10/min Conv AI price, inside 300 free mins.
-        llm = OpenAI(
+        # Phase 3.3: attach IMD MCP so the LLM can call resolve_location +
+        # forecast/warning tools via POST {BACKEND_URL}/mcp (enable_tools below).
+        mcp_servers = get_mcp_servers()
+        llm_kwargs: Dict[str, Any] = dict(
             model="gpt-4o-mini",
             system_messages=[{"role": "system", "content": WEATHERGPT_SYSTEM}],
             greeting_message=self.greeting,
@@ -85,6 +107,9 @@ class Agent:
             temperature=0.7,
             top_p=0.95,
         )
+        if mcp_servers is not None:
+            llm_kwargs["mcp_servers"] = mcp_servers
+        llm = OpenAI(**llm_kwargs)
         stt = DeepgramSTT(model="nova-3", language="en")
         tts = MiniMaxTTS(model="speech_2_6_turbo", voice_id="English_captivating_female1")
 

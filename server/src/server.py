@@ -32,6 +32,22 @@ except Exception:
     imd_client = None
     location_resolver = None
 
+# Phase 3.2/3.3 — FastMCP IMD tools at POST /mcp (Agora llm.mcp_servers).
+# Mount the streamable-HTTP app (matches SDK default transport) at root with
+# path="/mcp" so the final route is exactly /mcp (not /mcp/mcp).
+# stateless_http=True: each JSON-RPC POST is self-contained (no session
+# handshake), which suits Agora tool calls + TestClient verification.
+_mcp_http_app = None
+try:
+    from mcp_server import get_mcp
+
+    _mcp = get_mcp()
+    if _mcp is not None:
+        _mcp_http_app = _mcp.http_app(path="/mcp", stateless_http=True)
+except Exception as e:
+    logger.warning("MCP server unavailable: %s", e)
+    _mcp_http_app = None
+
 logger = logging.getLogger("uvicorn.error")
 
 
@@ -83,10 +99,14 @@ except ValueError as e:
 
 
 # FastAPI application
+# Phase 3.2: forward the MCP lifespan so POST /mcp works when mounted
+# (FastMCP ASGI integration requires lifespan=mcp_app.lifespan).
+_mcp_lifespan = _mcp_http_app.lifespan if _mcp_http_app is not None else None
 app = FastAPI(
     title="Agora Agent & Token Service",
     version="2.0.0",
     description="Agora Conversational AI service",
+    lifespan=_mcp_lifespan,
 )
 
 app.add_middleware(
@@ -332,6 +352,11 @@ async def agent_turns(
 
 
 app.include_router(router)
+
+# Mount AFTER the REST router so /health, /get_config, /startAgent etc. keep
+# priority and /mcp is served by FastMCP (plan.md 3.2: `curl .../mcp tools/list`).
+if _mcp_http_app is not None:
+    app.mount("/", _mcp_http_app)
 
 
 if __name__ == "__main__":
