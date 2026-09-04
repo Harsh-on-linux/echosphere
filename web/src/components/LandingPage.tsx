@@ -8,10 +8,12 @@ import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { LoadingSkeleton } from "@/components/LoadingSkeleton";
 import { QuickstartPreCallCard } from "@/components/QuickstartPreCallCard";
+import { SessionHistoryPanel } from "@/components/SessionHistoryPanel";
 import { VoiceSettingsPanel } from "@/components/VoiceSettingsPanel";
 import type { VoiceSettings } from "@/components/VoiceSettingsPanel";
 import { ShareButton } from "@/components/share-button";
-import { getConfig, startAgent, stopAgent } from "@/services/api";
+import { saveSnapshot } from "@/lib/sessionHistory";
+import { getAgentHistory, getAgentTurns, getConfig, startAgent, stopAgent } from "@/services/api";
 import type { AgoraRenewalTokens, AgoraTokenData } from "@/types/conversation";
 
 const ConversationComponent = dynamic(
@@ -97,6 +99,8 @@ export default function LandingPage() {
 	const [agentJoinError, setAgentJoinError] = useState(false);
 	// Phase 4.2: pre-call voice preference -> startAgent language/persona.
 	const [voiceSettings, setVoiceSettings] = useState<VoiceSettings | null>(null);
+	// Phase 6.2: session start for the persisted history snapshot.
+	const startedAtRef = useRef<number>(0);
 
 	useEffect(() => {
 		import("agora-rtc-react").catch(() => {});
@@ -155,8 +159,9 @@ export default function LandingPage() {
 				})(),
 			]);
 
-			setRtmClient(rtm);
-			setAgoraData({
+		setRtmClient(rtm);
+		startedAtRef.current = Date.now();
+		setAgoraData({
 				token: config.token,
 				uid: config.uid,
 				channel: config.channel_name,
@@ -201,6 +206,31 @@ export default function LandingPage() {
 	);
 
 	const handleEndConversation = async () => {
+		// Phase 6.2: persist history + turns for post-demo analytics (best-effort,
+		// never blocks leave). Snapshot first so a failing stopAgent can't lose it.
+		const snapshotAgentId = agoraData?.agentId;
+		const snapshotChannel = agoraData?.channel ?? "";
+		if (snapshotAgentId) {
+			try {
+				const [history, turns] = await Promise.all([
+					getAgentHistory(snapshotAgentId).catch(() => null),
+					getAgentTurns(snapshotAgentId, { pageSize: 50 }).catch(() => null),
+				]);
+				saveSnapshot({
+					agentId: snapshotAgentId,
+					channel: snapshotChannel,
+					startedAt: startedAtRef.current || Date.now(),
+					endedAt: Date.now(),
+					language: voiceSettings?.asrLanguage,
+					persona: voiceSettings?.persona,
+					history,
+					turns,
+				});
+			} catch {
+				// Persistence must never break conversation teardown.
+			}
+		}
+
 		if (agoraData?.agentId) {
 			try {
 				await stopAgent(agoraData.agentId);
@@ -239,6 +269,7 @@ export default function LandingPage() {
 								onStartConversation={handleStartConversation}
 							/>
 							<VoiceSettingsPanel onChange={setVoiceSettings} />
+							<SessionHistoryPanel />
 						</div>
 					) : agoraData && rtmClient ? (
 						<>

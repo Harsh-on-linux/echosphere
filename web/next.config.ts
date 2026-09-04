@@ -45,6 +45,10 @@ const nextConfig: NextConfig = {
         destination: `${backendUrl}/agentTurns`,
       },
       {
+        source: '/api/cycloneMap',
+        destination: `${backendUrl}/cycloneMap`,
+      },
+      {
         source: '/api/token',
         destination: `${backendUrl}/api/token`,
       },

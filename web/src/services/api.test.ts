@@ -1,6 +1,6 @@
 import { afterEach, expect, test } from 'bun:test'
 
-import { getConfig, interruptAgent, startAgent, stopAgent } from './api'
+import { getConfig, getCycloneMap, interruptAgent, startAgent, stopAgent } from './api'
 
 const originalFetch = globalThis.fetch
 let lastCall: { url: string; init?: RequestInit }
@@ -76,4 +76,18 @@ test('interruptAgent posts the agentId', async () => {
 test('getConfig throws on an error response', async () => {
   mockFetch(500, { detail: 'boom' })
   await expect(getConfig()).rejects.toThrow('boom')
+})
+
+test('getCycloneMap hits /api/cycloneMap and returns the FeatureCollection', async () => {
+  const geojson = { type: 'FeatureCollection', features: [], cyclone_name: 'X', source: 'IMD' }
+  mockFetch(200, { code: 0, msg: 'success', data: geojson })
+  const data = await getCycloneMap()
+  expect(data.type).toBe('FeatureCollection')
+  expect(data.cyclone_name).toBe('X')
+  expect(lastCall.url).toContain('/api/cycloneMap')
+})
+
+test('getCycloneMap throws when the envelope is an error', async () => {
+  mockFetch(200, { code: 1, msg: 'nope' })
+  await expect(getCycloneMap()).rejects.toThrow('nope')
 })

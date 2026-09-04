@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { AgentMetricsOverlay } from "@/components/AgentMetricsOverlay";
 import { ConnectionStatusPanel } from "@/components/ConnectionStatusPanel";
+import { CycloneMapPanel } from "@/components/CycloneMapPanel";
 import {
 	type ConnectionIssue,
 	getConversationIssueSeverity,
@@ -470,6 +471,7 @@ export default function ConversationComponent({
 			}
 			metricsOverlay={<AgentMetricsOverlay agentState={agentState} metrics={agentMetrics} />}
 			imdSourceCard={<IMDSourceCard />}
+			mapPanel={<CycloneMapPanel speaking={agentState === "speaking"} />}
 			controls={
 				<div className="mx-auto flex w-fit flex-wrap items-center justify-center gap-3">
 					<fieldset

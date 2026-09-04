@@ -144,3 +144,32 @@ export async function getAgentTurns(
   }
   return response.json()
 }
+
+export interface CycloneMapFeature {
+  type: 'Feature'
+  geometry: { type: string; coordinates: unknown }
+  properties: { kind: string; name?: string | null; category?: string; msw_kts?: number }
+}
+
+export interface CycloneMapData {
+  type: 'FeatureCollection'
+  features: CycloneMapFeature[]
+  cyclone_name: string | null
+  source: string
+  cached_at?: string
+}
+
+export async function getCycloneMap(): Promise<CycloneMapData> {
+  const response = await fetch(`${API_BASE_URL}/cycloneMap`, { method: 'GET' })
+
+  if (!response.ok) {
+    const error = await response.json()
+    throw new Error(error.detail || `HTTP ${response.status}`)
+  }
+
+  const result = await response.json()
+  if (result.code !== 0 || !result.data) {
+    throw new Error(result.msg || 'Failed to load cyclone map')
+  }
+  return result.data as CycloneMapData
+}

@@ -15,6 +15,8 @@ type QuickstartConversationLayoutProps = {
 	onEndConversation: () => void;
 	/** Phase 2: IMD source attribution card under the transcript (optional). */
 	imdSourceCard?: ReactNode;
+	/** Phase 6.2: cyclone cone map under the source card (optional). */
+	mapPanel?: ReactNode;
 };
 
 export function QuickstartConversationLayout({
@@ -26,6 +28,7 @@ export function QuickstartConversationLayout({
 	metricsOverlay,
 	onEndConversation,
 	imdSourceCard,
+	mapPanel,
 }: QuickstartConversationLayoutProps) {
 	return (
 		<div className="flex min-h-0 flex-1 flex-col text-left">
@@ -70,6 +73,7 @@ export function QuickstartConversationLayout({
 						{transcriptPanel}
 					</div>
 					{imdSourceCard}
+					{mapPanel}
 				</aside>
 
 				<main className="order-1 flex min-h-0 flex-1 flex-col lg:order-2 lg:border-l lg:border-border/80 lg:pl-6">

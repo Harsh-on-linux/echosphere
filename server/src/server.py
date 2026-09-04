@@ -157,6 +157,68 @@ app.add_middleware(
 )
 
 
+def _cyclone_geojson(track_payload: Any) -> Dict[str, Any]:
+    """Convert an IMD cyclonetrack payload to a GeoJSON FeatureCollection.
+
+    Emits one Point (current position) + one LineString (forecast track) +
+    one Polygon/MultiPolygon (cone of uncertainty) per cyclone entry, all in
+    [lon, lat] order. Unknown shapes pass through untouched; missing pieces
+    are skipped so the map never breaks on a partial IMD response.
+    """
+    features: list = []
+    entries = []
+    if isinstance(track_payload, dict):
+        data = track_payload.get("data")
+        entries = data if isinstance(data, list) else []
+    for entry in entries:
+        if not isinstance(entry, dict):
+            continue
+        name = entry.get("cyclone_name")
+        pos = entry.get("current_position") or {}
+        try:
+            lat, lon = float(pos["lat"]), float(pos["lon"])
+            features.append({
+                "type": "Feature",
+                "geometry": {"type": "Point", "coordinates": [lon, lat]},
+                "properties": {
+                    "kind": "position", "name": name,
+                    "category": pos.get("category"), "msw_kts": pos.get("msw_kts"),
+                },
+            })
+        except (KeyError, TypeError, ValueError):
+            pass
+        line: list = []
+        for fix in entry.get("forecast_track") or []:
+            try:
+                line.append([float(fix["lon"]), float(fix["lat"])])
+            except (KeyError, TypeError, ValueError):
+                continue
+        if len(line) >= 2:
+            features.append({
+                "type": "Feature",
+                "geometry": {"type": "LineString", "coordinates": line},
+                "properties": {"kind": "track", "name": name},
+            })
+        cone = entry.get("cone_of_uncertainty") or {}
+        if cone.get("type") in ("Polygon", "MultiPolygon") and cone.get("coordinates"):
+            features.append({
+                "type": "Feature",
+                "geometry": {"type": cone["type"], "coordinates": cone["coordinates"]},
+                "properties": {"kind": "cone", "name": name},
+            })
+    meta = track_payload if isinstance(track_payload, dict) else {}
+    return {
+        "type": "FeatureCollection",
+        "features": features,
+        "cyclone_name": next(
+            (e.get("cyclone_name") for e in entries if isinstance(e, dict) and e.get("cyclone_name")),
+            None,
+        ),
+        "source": meta.get("source", "IMD api.imd.gov.in/api/v1/cyclonetrack"),
+        "cached_at": meta.get("cached_at"),
+    }
+
+
 router = APIRouter()
 
 
@@ -393,6 +455,25 @@ async def agent_turns(
         return {"code": 0, "msg": "success", "data": _serialize(turns)}
     except Exception as e:
         _log_route_error("/agentTurns", e, agentId=agentId)
+        raise _to_http_error(e)
+
+
+@router.get("/cycloneMap")
+async def cyclone_map():
+    """Cyclone track + cone as GeoJSON (plan.md 6.2 map sync).
+
+    Built from IMD cyclonetrack (TTL-cached, mock fallback when
+    USE_MOCK_IMD=true). Frontend draws it on Leaflet and highlights the
+    cone while the agent is speaking.
+    """
+    if imd_client is None:
+        raise HTTPException(status_code=500, detail="IMD client unavailable.")
+
+    try:
+        track = await imd_client.get_cyclone_track()  # type: ignore
+        return {"code": 0, "msg": "success", "data": _cyclone_geojson(track)}
+    except Exception as e:
+        _log_route_error("/cycloneMap", e)
         raise _to_http_error(e)
 
 
