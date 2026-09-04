@@ -41,6 +41,10 @@ class FakeAgent:
         self.interrupted = []
         self.history_calls = []
         self.turns_calls = []
+        # Phase 6.3: PSTN Beta gate — flip in tests to exercise the dial path.
+        self.telephony_enabled = False
+        self.dial_calls = []
+        self.hangup_calls = []
 
     async def start(self, channel_name, agent_uid, user_uid, output_audio_codec=None,
                     language=None, persona=None):
@@ -71,6 +75,29 @@ class FakeAgent:
             raise ValueError(f"unknown agent_id: {agent_id}")
         self.turns_calls.append((agent_id, page_index, page_size))
         return {"turns": [], "page_index": page_index}
+
+    def telephony_status(self):
+        return {"enabled": self.telephony_enabled, "mode": "fake"}
+
+    async def dial_call(self, to_number, from_number=None, language=None, persona=None):
+        import agent as agent_module
+
+        to = agent_module.parse_e164_number(to_number, "toNumber")
+        if from_number is not None:
+            agent_module.parse_e164_number(from_number, "fromNumber")
+        if not self.telephony_enabled:
+            raise agent_module.TelephonyDisabledError(agent_module.TELEPHONY_SETUP_GUIDE)
+        self.dial_calls.append((to, from_number, language, persona))
+        return {"agent_id": "fake-tel-1", "channel_name": "tel-ch", "to_number": to, "status": "calling"}
+
+    async def hangup_call(self, agent_id):
+        import agent as agent_module
+
+        if not self.telephony_enabled:
+            raise agent_module.TelephonyDisabledError(agent_module.TELEPHONY_SETUP_GUIDE)
+        if agent_id == "unknown-id":
+            raise ValueError(f"unknown agent_id: {agent_id}")
+        self.hangup_calls.append(agent_id)
 
 
 @pytest.fixture

@@ -5,12 +5,15 @@ High-level API for managing Agora Conversational AI Agents.
 """
 import logging
 import os
+import random
+import re
 import time
 from typing import Any, Dict, Optional
 from urllib.parse import urlparse
 
 from agora_agent import Area, AsyncAgora
 from agora_agent.agentkit import Agent as AgoraAgent, SalConfig
+from agora_agent.agentkit.token import generate_convo_ai_token
 from agora_agent.agentkit.vendors import (
     DeepgramSTT,
     MiniMaxTTS,
@@ -65,6 +68,55 @@ WEATHERGPT_FAILURE = (
 WEATHERGPT_MAX_HISTORY = 10
 # Free-tier guard: auto-leave after 2 min silence (plan.md 2.1/2.3, AGENTS.md #5).
 WEATHERGPT_IDLE_TIMEOUT = 120
+
+
+# Phase 6.3 — Telephony (PSTN) via Agora Telephony Beta (research.md #9).
+# Outbound dial uses AsyncAgora.telephony.call (SIP); inbound 201/202
+# call-state events land on POST /telephonyWebhook (server.py). Until Agora
+# grants Beta access, TELEPHONY_ENABLED stays false and /dial answers 501
+# with setup steps — the phone-bridge fallback (mobile on speaker near the
+# laptop mic) proves the same voice loop with zero PSTN cost.
+class TelephonyDisabledError(RuntimeError):
+    """PSTN dialed before the Telephony Beta is enabled (maps to HTTP 501)."""
+
+
+TELEPHONY_SETUP_GUIDE = (
+    "Telephony Beta is not enabled. Steps: 1) Agora Console > Talk to Us > "
+    "request Telephony Beta (mention SIH26068). 2) Set TELEPHONY_ENABLED=true "
+    "and TELEPHONY_FROM_NUMBER=+<your-agora-number> with CUSTOMER_ID/SECRET. "
+    "3) Redeploy and point the Console webhook at POST /telephonyWebhook. "
+    "Meanwhile use the phone-bridge fallback: call the demo laptop from any "
+    "phone on speaker next to its mic."
+)
+
+_E164_RE = re.compile(r"^\+[1-9]\d{7,14}$")
+
+
+def parse_e164_number(raw: Any, field: str = "phone number") -> str:
+    """Normalize to E.164, raising ValueError (HTTP 400) for bad input.
+
+    The leading + (country code) is mandatory — never guess it, or
+    9876543210 could dial the wrong country.
+    """
+    text = re.sub(r"[\s\-().]", "", str(raw or ""))
+    if not _E164_RE.match(text):
+        raise ValueError(f"invalid {field}: {raw!r} — expected E.164 like +919876543210")
+    return text
+
+
+def telephony_status_info() -> Dict[str, Any]:
+    """PSTN readiness from env only (no Agora cloud call)."""
+    enabled_flag = (os.getenv("TELEPHONY_ENABLED") or "").strip().lower() in {"1", "true", "yes", "on"}
+    from_number = (os.getenv("TELEPHONY_FROM_NUMBER") or "").strip()
+    customer_auth = bool((os.getenv("CUSTOMER_ID") or "").strip() and (os.getenv("CUSTOMER_SECRET") or "").strip())
+    enabled = enabled_flag and bool(from_number) and customer_auth
+    return {
+        "enabled": enabled,
+        "mode": "beta-direct" if enabled else "phone-bridge-fallback",
+        "from_number_configured": bool(from_number),
+        "customer_auth_configured": customer_auth,
+        "webhook_path": "/telephonyWebhook",
+    }
 
 
 def get_sal_config() -> Optional[Dict[str, Any]]:
@@ -128,14 +180,25 @@ class Agent:
         if not self.app_id or not self.app_certificate:
             raise ValueError("AGORA_APP_ID and AGORA_APP_CERTIFICATE are required")
 
+        # Phase 6.3: REST (Basic) auth for telephony/phone-numbers APIs.
+        # Optional — voice sessions work without it; /dial needs it.
+        client_kwargs: Dict[str, Any] = {}
+        customer_id = (os.getenv("CUSTOMER_ID") or "").strip()
+        customer_secret = (os.getenv("CUSTOMER_SECRET") or "").strip()
+        if customer_id and customer_secret:
+            client_kwargs["customer_id"] = customer_id
+            client_kwargs["customer_secret"] = customer_secret
         self.client = AsyncAgora(
             area=Area.US,
             app_id=self.app_id,
             app_certificate=self.app_certificate,
+            **client_kwargs,
         )
 
         # Track active sessions by agent_id
         self._sessions: Dict[str, Any] = {}
+        # Agent IDs created via PSTN dial (hangup path, not RTC stop)
+        self._telephony_ids: set = set()
 
     async def start(
         self,
@@ -340,6 +403,11 @@ class Agent:
         if not agent_id or not str(agent_id).strip():
             raise ValueError("agent_id is required and cannot be empty")
 
+        # Phase 6.3: PSTN calls end via telephony hangup, not RTC stop.
+        if agent_id in self._telephony_ids:
+            await self.hangup_call(agent_id)
+            return
+
         session = self._sessions.pop(agent_id, None)
         if session:
             try:
@@ -357,10 +425,111 @@ class Agent:
         logger.info("Stopping Agora agent through client.stop_agent agent_id=%s", agent_id)
         await self.client.stop_agent(agent_id)
 
+    def telephony_status(self) -> Dict[str, Any]:
+        """PSTN readiness (plan.md 6.3) — env only, no cloud call."""
+        return telephony_status_info()
+
+    async def dial_call(
+        self,
+        to_number: str,
+        from_number: Optional[str] = None,
+        language: Optional[str] = None,
+        persona: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        """Outbound PSTN call that joins the callee to a WeatherGPT voice agent.
+
+        Requires the Telephony Beta (TELEPHONY_ENABLED + FROM_NUMBER +
+        CUSTOMER_ID/SECRET); otherwise raises TelephonyDisabledError (501)
+        with setup steps. Uses the SDK telephony.call SIP path with minimal
+        channel properties — after the Beta grant, embed the full WeatherGPT
+        STT/LLM/TTS pipeline config here so phone callers get the same
+        Hinglish/Indic voice loop as web callers.
+        """
+        status = telephony_status_info()
+        if not status["enabled"]:
+            raise TelephonyDisabledError(TELEPHONY_SETUP_GUIDE)
+        to = parse_e164_number(to_number, "toNumber")
+        frm = parse_e164_number(from_number or os.getenv("TELEPHONY_FROM_NUMBER", ""), "fromNumber")
+
+        channel_name = f"tel-{int(time.time())}-{random.randint(1000, 9999)}"
+        sip_uid = random.randint(1000, 9999999)
+        agent_rtc_uid = str(random.randint(10000000, 99999999))
+        sip_token = generate_convo_ai_token(
+            app_id=self.app_id,
+            app_certificate=self.app_certificate,
+            channel_name=channel_name,
+            uid=sip_uid,
+            token_expire=3600,
+        )
+        channel_token = generate_convo_ai_token(
+            app_id=self.app_id,
+            app_certificate=self.app_certificate,
+            channel_name=channel_name,
+            uid=int(agent_rtc_uid),
+            token_expire=3600,
+        )
+
+        try:
+            from agora_agent.telephony.types.call_telephony_request_properties import (
+                CallTelephonyRequestProperties,
+            )
+            from agora_agent.telephony.types.call_telephony_request_sip import (
+                CallTelephonyRequestSip,
+            )
+        except ImportError as e:
+            raise RuntimeError(f"agora-agents SDK has no telephony support: {e}")
+
+        sip = CallTelephonyRequestSip(
+            to_number=to,
+            from_number=frm,
+            rtc_uid=str(sip_uid),
+            rtc_token=sip_token,
+        )
+        properties = CallTelephonyRequestProperties(
+            channel=channel_name,
+            token=channel_token,
+            agent_rtc_uid=agent_rtc_uid,
+            remote_rtc_uids=[str(sip_uid)],
+        )
+        try:
+            response = await self.client.telephony.call(
+                self.app_id,
+                name=f"wx-tel-{int(time.time())}",
+                sip=sip,
+                properties=properties,
+            )
+        except Exception:
+            logger.exception("Telephony dial failed to_number=%s channel=%s", to, channel_name)
+            raise
+
+        agent_id = response.agent_id
+        self._telephony_ids.add(agent_id)
+        logger.info("Started telephony call agent_id=%s to=%s channel=%s", agent_id, to, channel_name)
+        return {
+            "agent_id": agent_id,
+            "channel_name": channel_name,
+            "to_number": to,
+            "status": "calling",
+            "language": normalize_language(language),
+            "persona": normalize_persona(persona),
+        }
+
+    async def hangup_call(self, agent_id: str) -> None:
+        """End a PSTN call (plan.md 6.3)."""
+        if not agent_id or not str(agent_id).strip():
+            raise ValueError("agent_id is required and cannot be empty")
+        if not telephony_status_info()["enabled"]:
+            raise TelephonyDisabledError(TELEPHONY_SETUP_GUIDE)
+        await self.client.telephony.hangup(self.app_id, agent_id)
+        self._telephony_ids.discard(agent_id)
+        logger.info("Hung up telephony call agent_id=%s", agent_id)
+
     async def interrupt(self, agent_id: str) -> None:
         """Manually interrupt a speaking/thinking agent (plan.md 2.2 InterruptButton)."""
         if not agent_id or not str(agent_id).strip():
             raise ValueError("agent_id is required and cannot be empty")
+        if agent_id in self._telephony_ids:
+            raise ValueError(f"telephony call {agent_id}: RTC controls unavailable, use hangup")
         session = self._sessions.get(agent_id)
         if session is None:
             raise ValueError(f"unknown agent_id: {agent_id}")
@@ -371,6 +540,8 @@ class Agent:
         """Return conversation history for verification (plan.md 2.1: check turns)."""
         if not agent_id or not str(agent_id).strip():
             raise ValueError("agent_id is required and cannot be empty")
+        if agent_id in self._telephony_ids:
+            raise ValueError(f"telephony call {agent_id}: RTC controls unavailable, use hangup")
         session = self._sessions.get(agent_id)
         if session is None:
             raise ValueError(f"unknown agent_id: {agent_id}")
@@ -385,6 +556,8 @@ class Agent:
         """Return per-turn latency metrics (plan.md 2.1: target <1s ASR+LLM+TTS)."""
         if not agent_id or not str(agent_id).strip():
             raise ValueError("agent_id is required and cannot be empty")
+        if agent_id in self._telephony_ids:
+            raise ValueError(f"telephony call {agent_id}: RTC controls unavailable, use hangup")
         session = self._sessions.get(agent_id)
         if session is None:
             raise ValueError(f"unknown agent_id: {agent_id}")

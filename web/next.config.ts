@@ -49,6 +49,18 @@ const nextConfig: NextConfig = {
         destination: `${backendUrl}/cycloneMap`,
       },
       {
+        source: '/api/dial',
+        destination: `${backendUrl}/dial`,
+      },
+      {
+        source: '/api/hangup',
+        destination: `${backendUrl}/hangup`,
+      },
+      {
+        source: '/api/telephonyStatus',
+        destination: `${backendUrl}/telephonyStatus`,
+      },
+      {
         source: '/api/token',
         destination: `${backendUrl}/api/token`,
       },

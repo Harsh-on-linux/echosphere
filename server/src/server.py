@@ -65,6 +65,14 @@ def _log_route_error(route: str, exc: Exception, **context) -> None:
 
 def _to_http_error(exc: Exception) -> HTTPException:
     """Convert SDK exceptions to HTTP errors"""
+    # Phase 6.3: PSTN dialed before the Telephony Beta grant -> 501 + guide.
+    try:
+        from agent import TelephonyDisabledError
+
+        if isinstance(exc, TelephonyDisabledError):
+            return HTTPException(status_code=501, detail=str(exc))
+    except ImportError:
+        pass
     if isinstance(exc, ValueError):
         return HTTPException(status_code=400, detail=str(exc))
     if isinstance(exc, RuntimeError):
@@ -247,6 +255,19 @@ class TokenRequest(BaseModel):
     """Request body for POST /api/token (plan.md 1.3)"""
     channel: Optional[str] = None
     uid: Optional[int] = None
+
+
+class DialRequest(BaseModel):
+    """Request body for POST /dial (plan.md 6.3 PSTN outbound)"""
+    toNumber: str
+    fromNumber: Optional[str] = None
+    language: Optional[str] = None
+    persona: Optional[str] = None
+
+
+class HangupRequest(BaseModel):
+    """Request body for POST /hangup (plan.md 6.3 PSTN end)"""
+    agentId: str
 
 
 # --- Health & Token (Phase 1.2/1.3) ---
@@ -475,6 +496,80 @@ async def cyclone_map():
     except Exception as e:
         _log_route_error("/cycloneMap", e)
         raise _to_http_error(e)
+
+
+# --- Telephony (PSTN) — Phase 6.3 ---
+# Outbound dial + hangup wrap AsyncAgora.telephony (SIP, Beta-gated: 501 with
+# setup steps until TELEPHONY_ENABLED + FROM_NUMBER + CUSTOMER auth are set).
+# Inbound 201/202 call-state events land on POST /telephonyWebhook — point the
+# Agora Console webhook there after the Beta grant. Until then, the
+# phone-bridge fallback (mobile on speaker by the laptop mic) demos the same
+# voice loop with zero PSTN cost.
+
+@router.get("/telephonyStatus")
+async def telephony_status():
+    """PSTN readiness (env only, no cloud call) — drives the phone panel UI."""
+    try:
+        from agent import telephony_status_info
+
+        info = telephony_status_info()
+    except ImportError:
+        info = {"enabled": False, "mode": "phone-bridge-fallback"}
+    return {"code": 0, "msg": "success", "data": info}
+
+
+@router.post("/dial")
+async def dial(request: DialRequest):
+    """Outbound PSTN call joining the callee to a WeatherGPT agent (plan.md 6.3)"""
+    if agent is None:
+        raise HTTPException(
+            status_code=500,
+            detail="Service not properly configured. Please check environment variables.",
+        )
+
+    try:
+        result = await agent.dial_call(
+            request.toNumber,
+            from_number=request.fromNumber,
+            language=request.language,
+            persona=request.persona,
+        )
+        return {"code": 0, "msg": "success", "data": _serialize(result)}
+    except Exception as e:
+        _log_route_error("/dial", e, toNumber=request.toNumber)
+        raise _to_http_error(e)
+
+
+@router.post("/hangup")
+async def hangup(request: HangupRequest):
+    """End a PSTN call started via POST /dial (plan.md 6.3)"""
+    if agent is None:
+        raise HTTPException(
+            status_code=500,
+            detail="Service not properly configured. Please check environment variables.",
+        )
+
+    try:
+        await agent.hangup_call(request.agentId)
+        return {"code": 0, "msg": "success"}
+    except Exception as e:
+        _log_route_error("/hangup", e, agentId=request.agentId)
+        raise _to_http_error(e)
+
+
+@router.post("/telephonyWebhook")
+async def telephony_webhook(payload: Dict[str, Any]):
+    """Receiver for Agora 201/202 inbound/outbound call-state events (plan.md 6.3).
+
+    Accepts any JSON (event shapes vary by Beta version), logs the call state
+    for post-demo analytics, and always answers 200 so Agora stops retrying.
+    """
+    try:
+        event = payload.get("event") if isinstance(payload, dict) else None
+        logger.info("Telephony webhook event=%s payload_keys=%s", event, sorted(payload.keys()) if isinstance(payload, dict) else "?")
+    except Exception:
+        logger.exception("Telephony webhook logging failed")
+    return {"code": 0, "msg": "received"}
 
 
 app.include_router(router)

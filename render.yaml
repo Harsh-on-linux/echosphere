@@ -34,3 +34,8 @@ services:
         value: managed
       - key: SARVAM_API_KEY
         sync: false
+      # Phase 6.3: PSTN stays off until Agora grants the Telephony Beta.
+      # After the grant, set TELEPHONY_ENABLED=true + TELEPHONY_FROM_NUMBER in
+      # the dashboard and point the Console webhook at POST /telephonyWebhook.
+      - key: TELEPHONY_ENABLED
+        value: "false"

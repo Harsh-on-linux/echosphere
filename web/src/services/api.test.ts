@@ -1,6 +1,6 @@
 import { afterEach, expect, test } from 'bun:test'
 
-import { getConfig, getCycloneMap, interruptAgent, startAgent, stopAgent } from './api'
+import { dialNumber, getConfig, getCycloneMap, hangupCall, interruptAgent, startAgent, stopAgent } from './api'
 
 const originalFetch = globalThis.fetch
 let lastCall: { url: string; init?: RequestInit }
@@ -90,4 +90,31 @@ test('getCycloneMap hits /api/cycloneMap and returns the FeatureCollection', asy
 test('getCycloneMap throws when the envelope is an error', async () => {
   mockFetch(200, { code: 1, msg: 'nope' })
   await expect(getCycloneMap()).rejects.toThrow('nope')
+})
+
+test('dialNumber posts toNumber and returns the call', async () => {
+  mockFetch(200, {
+    code: 0,
+    msg: 'success',
+    data: { agent_id: 'tel-1', channel_name: 'tel-ch', to_number: '+919876543210', status: 'calling' },
+  })
+  const result = await dialNumber('+919876543210', { language: 'hi-IN' })
+  expect(result.agent_id).toBe('tel-1')
+  expect(lastCall.url).toContain('/api/dial')
+  expect(JSON.parse(String(lastCall.init?.body))).toEqual({
+    toNumber: '+919876543210',
+    language: 'hi-IN',
+  })
+})
+
+test('dialNumber surfaces the Beta-disabled guide', async () => {
+  mockFetch(501, { detail: 'Telephony Beta is not enabled. Steps: ...' })
+  await expect(dialNumber('+919876543210')).rejects.toThrow('Telephony Beta')
+})
+
+test('hangupCall posts the agentId', async () => {
+  mockFetch(200, { code: 0, msg: 'success' })
+  await hangupCall('tel-1')
+  expect(lastCall.url).toContain('/api/hangup')
+  expect(JSON.parse(String(lastCall.init?.body))).toEqual({ agentId: 'tel-1' })
 })

@@ -173,3 +173,75 @@ export async function getCycloneMap(): Promise<CycloneMapData> {
   }
   return result.data as CycloneMapData
 }
+
+export interface TelephonyStatus {
+  enabled: boolean
+  mode: string
+  from_number_configured: boolean
+  customer_auth_configured: boolean
+  webhook_path?: string
+}
+
+export async function getTelephonyStatus(): Promise<TelephonyStatus> {
+  const response = await fetch(`${API_BASE_URL}/telephonyStatus`, { method: 'GET' })
+
+  if (!response.ok) {
+    const error = await response.json()
+    throw new Error(error.detail || `HTTP ${response.status}`)
+  }
+
+  const result = await response.json()
+  if (result.code !== 0 || !result.data) {
+    throw new Error(result.msg || 'Failed to load telephony status')
+  }
+  return result.data as TelephonyStatus
+}
+
+export interface DialResult {
+  agent_id: string
+  channel_name: string
+  to_number: string
+  status: string
+}
+
+export async function dialNumber(
+  toNumber: string,
+  options?: { fromNumber?: string; language?: string; persona?: string },
+): Promise<DialResult> {
+  const payload: Record<string, unknown> = { toNumber }
+  if (options?.fromNumber) payload.fromNumber = options.fromNumber
+  if (options?.language) payload.language = options.language
+  if (options?.persona) payload.persona = options.persona
+
+  const response = await fetch(`${API_BASE_URL}/dial`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  })
+
+  if (!response.ok) {
+    const error = await response.json()
+    throw new Error(error.detail || `HTTP ${response.status}`)
+  }
+
+  const result = await response.json()
+  if (result.code !== 0 || !result.data?.agent_id) {
+    throw new Error(result.msg || 'Failed to start call')
+  }
+  return result.data as DialResult
+}
+
+export async function hangupCall(agentId: string): Promise<void> {
+  if (!agentId) return
+
+  const response = await fetch(`${API_BASE_URL}/hangup`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ agentId }),
+  })
+
+  if (!response.ok) {
+    const error = await response.json()
+    throw new Error(error.detail || `HTTP ${response.status}`)
+  }
+}

@@ -9,6 +9,7 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { LoadingSkeleton } from "@/components/LoadingSkeleton";
 import { QuickstartPreCallCard } from "@/components/QuickstartPreCallCard";
 import { SessionHistoryPanel } from "@/components/SessionHistoryPanel";
+import { TelephonyPanel } from "@/components/TelephonyPanel";
 import { VoiceSettingsPanel } from "@/components/VoiceSettingsPanel";
 import type { VoiceSettings } from "@/components/VoiceSettingsPanel";
 import { ShareButton } from "@/components/share-button";
@@ -270,6 +271,7 @@ export default function LandingPage() {
 							/>
 							<VoiceSettingsPanel onChange={setVoiceSettings} />
 							<SessionHistoryPanel />
+							<TelephonyPanel />
 						</div>
 					) : agoraData && rtmClient ? (
 						<>

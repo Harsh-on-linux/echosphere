@@ -88,6 +88,16 @@ This curls `/health` (expects `status: ok`, `agora_configured: true`,
 `mcp_public_https: true`) and `POST /mcp` `tools/list`. Then run one full voice
 session via the production URL per plan.md 6.1.
 
+### Phone calls (Telephony Beta, plan.md 6.3)
+
+- **Without the Beta (today):** use the phone-bridge fallback — start a conversation
+  on the laptop, call it from any phone on speaker, hold the phone near the mic.
+  Same voice loop, zero PSTN cost.
+- **With the Beta:** request via Console → Talk to Us (mention SIH26068), set
+  `TELEPHONY_ENABLED=true` + `TELEPHONY_FROM_NUMBER` (+ `CUSTOMER_ID`/`CUSTOMER_SECRET`),
+  redeploy, point the Console webhook at `POST /telephonyWebhook`. Then dial from the
+  pre-call Phone Call panel (`POST /dial`, E.164) and end with `POST /hangup`.
+
 
 Set backend env values:
 
