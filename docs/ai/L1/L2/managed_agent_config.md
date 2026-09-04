@@ -8,7 +8,7 @@ All managed agent configuration is in `server/src/agent.py`. The browser sends `
 
 ## The Agent Builder Chain
 
-`AsyncAgora` is constructed once at `Agent.__init__` time and held as `self.client`. All provider options (`turn_detection`, `advanced_features`, `parameters`) live on `AgoraAgent`, not on `create_async_session`.
+`AsyncAgora` is constructed once at `Agent.__init__` time and held as `self.client`. All provider options (`turn_detection`, `advanced_features`, `sal`, `parameters`) live on `AgoraAgent`, not on `create_async_session`.
 
 ```python
 from agora_agent import Area, AsyncAgora
@@ -108,6 +108,26 @@ For a BYOK provider, document the new env var in `server/.env.example`.
 - `enable_string_uid` — `False` keeps UIDs numeric for both RTC and RTM. Flipping to `True` requires matching changes in the browser join path.
 
 `data_channel`, `enable_error_message`, and `enable_metrics` are session-level parameters but live in the `parameters=` dict on `AgoraAgent`, not in `create_async_session`.
+
+### Noise suppression and SAL
+
+The `audio_scenario: "chorus"` parameter uses Agora's built-in noise
+suppression and echo cancellation for every session. SAL is separate and must
+be enabled with a voiceprint:
+
+```python
+sal=SalConfig(
+    sal_mode="locking",
+    sample_urls={"default": "https://host.example/voiceprints/fisherman.wav"},
+),
+advanced_features={"enable_sal": True, "enable_rtm": True, "enable_tools": True},
+```
+
+WeatherGPT keeps SAL disabled unless `SAL_ENABLED=true` and
+`SAL_SAMPLE_URL` is a valid HTTPS URL. `SAL_MODE` accepts `locking` or
+`recognition`; invalid configuration fails closed and uses built-in noise
+suppression only. Voiceprints must be hosted externally, consented, and kept
+out of git.
 
 ## Async Lifetime
 

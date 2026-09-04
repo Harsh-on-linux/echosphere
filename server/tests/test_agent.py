@@ -127,9 +127,39 @@ def test_start_wires_weathergpt_voice_loop(fake_env, monkeypatch):
     enabled = interruption.get("enable") if isinstance(interruption, dict) else getattr(interruption, "enable", None)
     assert enabled is True
     assert interruption["mode"] == "start_of_speech"
+    assert config["advanced_features"].get("enable_sal") is None
+    assert config.get("sal") is None
     # Free-tier guard: 2 min idle timeout, wx- session names
     assert captured["idle_timeout"] == 120
     assert str(captured["name"]).startswith("wx-")
+
+
+def test_start_wires_opt_in_sal(fake_env, monkeypatch):
+    """Phase 5.2: SAL is opt-in and sent through the SDK sal field."""
+    agent = _fresh_agent_module()
+    monkeypatch.setenv("SAL_ENABLED", "true")
+    monkeypatch.setenv("SAL_SAMPLE_URL", "https://example.com/sal.wav")
+    captured = {}
+
+    class FakeSession:
+        async def start(self):
+            return "test-agent-id"
+
+    def fake_create_async_session(self, **kwargs):
+        captured["config"] = self.config
+        return FakeSession()
+
+    from agora_agent.agentkit import Agent as AgoraAgent
+    monkeypatch.setattr(AgoraAgent, "create_async_session", fake_create_async_session)
+
+    instance = agent.Agent()
+    asyncio.run(instance.start(channel_name="ch", agent_uid=111, user_uid=222))
+
+    config = captured["config"]
+    assert config["advanced_features"]["enable_sal"] is True
+    sal = config["sal"]
+    assert sal.sal_mode == "locking"
+    assert sal.sample_urls == {"default": "https://example.com/sal.wav"}
 
 
 def test_interrupt_history_turns_passthrough(fake_env, monkeypatch):

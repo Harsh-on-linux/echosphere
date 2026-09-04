@@ -7,9 +7,10 @@ import logging
 import os
 import time
 from typing import Any, Dict, Optional
+from urllib.parse import urlparse
 
 from agora_agent import Area, AsyncAgora
-from agora_agent.agentkit import Agent as AgoraAgent
+from agora_agent.agentkit import Agent as AgoraAgent, SalConfig
 from agora_agent.agentkit.vendors import (
     DeepgramSTT,
     MiniMaxTTS,
@@ -64,6 +65,31 @@ WEATHERGPT_FAILURE = (
 WEATHERGPT_MAX_HISTORY = 10
 # Free-tier guard: auto-leave after 2 min silence (plan.md 2.1/2.3, AGENTS.md #5).
 WEATHERGPT_IDLE_TIMEOUT = 120
+
+
+def get_sal_config() -> Optional[Dict[str, Any]]:
+    """Return opt-in SAL settings when a public voiceprint is configured.
+
+    Agora's built-in noise suppression remains enabled for every audio session.
+    SAL is an extra voiceprint feature, so keep it disabled unless explicitly
+    enabled and fail closed when the sample URL is missing or unsafe.
+    """
+    enabled = (os.getenv("SAL_ENABLED") or "").strip().lower() in {"1", "true", "yes", "on"}
+    if not enabled:
+        return None
+
+    sample_url = (os.getenv("SAL_SAMPLE_URL") or "").strip()
+    parsed = urlparse(sample_url)
+    if parsed.scheme != "https" or not parsed.netloc:
+        logger.warning("SAL_ENABLED is true but SAL_SAMPLE_URL is not a valid HTTPS URL; SAL disabled")
+        return None
+
+    mode = (os.getenv("SAL_MODE") or "locking").strip().lower()
+    if mode not in {"locking", "recognition"}:
+        logger.warning("Unsupported SAL_MODE=%s; expected locking or recognition; SAL disabled", mode)
+        return None
+
+    return {"sal_mode": mode, "sample_urls": {"default": sample_url}}
 
 
 def get_mcp_servers() -> Optional[list]:
@@ -199,13 +225,20 @@ class Agent:
         # )
 
         parameters = {
-            "audio_scenario": "chorus",  # web client → ultra-low-latency chorus profile
+            # Agora's audio scenario includes built-in noise suppression and
+            # echo cancellation; SAL below is an optional extra layer.
+            "audio_scenario": "chorus",  # web client -> ultra-low-latency profile
             "data_channel": "rtm",
             "enable_error_message": True,
             "enable_metrics": True,
         }
         if isinstance(output_audio_codec, str) and output_audio_codec.strip():
             parameters["output_audio_codec"] = output_audio_codec.strip()
+
+        sal_config = get_sal_config()
+        advanced_features = {"enable_rtm": True, "enable_tools": True}
+        if sal_config is not None:
+            advanced_features["enable_sal"] = True
 
         agora_agent = AgoraAgent(
             client=self.client,
@@ -241,7 +274,8 @@ class Agent:
                 },
             },
             interruption={"enable": True, "mode": "start_of_speech"},
-            advanced_features={"enable_rtm": True, "enable_tools": True},
+            sal=SalConfig(**sal_config) if sal_config is not None else None,
+            advanced_features=advanced_features,
             parameters=parameters,
         )
         

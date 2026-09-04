@@ -103,6 +103,25 @@ python src/server.py
 
 The service will start on port 8000 (or the port specified in `.env`).
 
+### Optional SAL voiceprint
+
+Agora's standard audio scenario provides built-in noise suppression and echo
+cancellation for every session. Selective Attention Locking (SAL) is disabled
+by default because it requires a hosted voiceprint and is a beta feature. To
+enable it for a fisherman or group-call demo, set all of the following in
+`server/.env`:
+
+```dotenv
+SAL_ENABLED=true
+SAL_MODE=locking
+SAL_SAMPLE_URL=https://your-host.example.com/voiceprints/fisherman.wav
+```
+
+The URL must be HTTPS. Missing, invalid, or unsupported settings disable SAL
+without preventing the agent from starting. Do not commit voiceprint audio or
+credentials to this repository; host the sample externally. Use a short,
+consented recording of the primary speaker and remove it after the demo.
+
 ## How This Fits The Repo
 
 - Full-stack local development: run `bun run dev` from the repo root. The browser still calls Next `/api/*`, and Next rewrites those requests to this FastAPI service.
