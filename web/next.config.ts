@@ -33,6 +33,18 @@ const nextConfig: NextConfig = {
         destination: `${backendUrl}/stopAgent`,
       },
       {
+        source: '/api/interruptAgent',
+        destination: `${backendUrl}/interruptAgent`,
+      },
+      {
+        source: '/api/agentHistory',
+        destination: `${backendUrl}/agentHistory`,
+      },
+      {
+        source: '/api/agentTurns',
+        destination: `${backendUrl}/agentTurns`,
+      },
+      {
         source: '/api/token',
         destination: `${backendUrl}/api/token`,
       },

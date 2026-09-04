@@ -7,6 +7,8 @@ import {
 	type ConnectionIssue,
 	getConversationIssueSeverity,
 } from "@/components/ConversationErrorCard";
+import { IMDSourceCard } from "@/components/IMDSourceCard";
+import { InterruptButton } from "@/components/InterruptButton";
 import { MicrophoneSelector } from "@/components/MicrophoneSelector";
 import { QuickstartConversationLayout } from "@/components/QuickstartConversationLayout";
 import {
@@ -14,6 +16,7 @@ import {
 	QuickstartPipelineMetrics,
 } from "@/components/QuickstartPipelineMetrics";
 import { QuickstartTranscriptPanel } from "@/components/QuickstartTranscriptPanel";
+import { VoiceOrb } from "@/components/VoiceOrb";
 import { DEFAULT_AGENT_UID } from "@/lib/agora";
 import {
 	getCurrentInProgressMessage,
@@ -32,8 +35,7 @@ import {
 	type TranscriptHelperItem,
 	TranscriptHelperMode,
 	type UserTranscription,
-} from "agora-agent-client-toolkit";
-import { AgentVisualizer } from "agora-agent-uikit";
+	} from "agora-agent-client-toolkit";
 import { MicButtonWithVisualizer } from "agora-agent-uikit/rtc";
 import {
 	RemoteUser,
@@ -454,37 +456,37 @@ export default function ConversationComponent({
 				/>
 			}
 			visualizer={
-				<section
-					className="relative flex h-full min-h-[20rem] w-full max-w-4xl items-center justify-center"
-					aria-label="AI agent status visualization"
-				>
-					<AgentVisualizer state={visualizerState} size="lg" />
+				<VoiceOrb state={visualizerState}>
 					{remoteUsers.map((user) => (
 						<div key={user.uid} className="hidden">
 							<RemoteUser user={user} />
 						</div>
 					))}
-				</section>
+				</VoiceOrb>
 			}
+			imdSourceCard={<IMDSourceCard />}
 			controls={
-				<fieldset
-					className="mx-auto flex w-fit items-center gap-3 rounded-full border border-border bg-card/80 px-4 py-2 backdrop-blur-md"
-					aria-label="Audio controls"
-				>
-					<div className="conversation-mic-host flex items-center justify-center">
-						<MicButtonWithVisualizer
-							isEnabled={isEnabled}
-							setIsEnabled={setIsEnabled}
-							track={localMicrophoneTrack}
-							onToggle={handleMicToggle}
-							className="overflow-visible"
-							aria-label={isEnabled ? "Mute microphone" : "Unmute microphone"}
-							enabledColor="hsl(var(--primary))"
-							disabledColor="hsl(var(--destructive))"
-						/>
-					</div>
-					<MicrophoneSelector localMicrophoneTrack={localMicrophoneTrack} />
-				</fieldset>
+				<div className="mx-auto flex w-fit flex-wrap items-center justify-center gap-3">
+					<fieldset
+						className="flex w-fit items-center gap-3 rounded-full border border-border bg-card/80 px-4 py-2 backdrop-blur-md"
+						aria-label="Audio controls"
+					>
+						<div className="conversation-mic-host flex items-center justify-center">
+							<MicButtonWithVisualizer
+								isEnabled={isEnabled}
+								setIsEnabled={setIsEnabled}
+								track={localMicrophoneTrack}
+								onToggle={handleMicToggle}
+								className="overflow-visible"
+								aria-label={isEnabled ? "Mute microphone" : "Unmute microphone"}
+								enabledColor="hsl(var(--primary))"
+								disabledColor="hsl(var(--destructive))"
+							/>
+						</div>
+						<MicrophoneSelector localMicrophoneTrack={localMicrophoneTrack} />
+					</fieldset>
+					<InterruptButton agentId={agoraData.agentId} />
+				</div>
 			}
 			onEndConversation={handleEndConversation}
 		/>

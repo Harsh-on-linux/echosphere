@@ -24,11 +24,11 @@ export function QuickstartPreCallCard({
 			}}
 		>
 			<h1 className="text-[28px] font-medium leading-[1.2] text-white">
-				Try Agora&apos;s Voice Agent
+				Talk to WeatherGPT
 			</h1>
 			<p className="mt-[14px] text-sm font-medium leading-6 text-muted-foreground">
-				Built on Agora&apos;s flagship Conversational AI engine, for effortless
-				agentic conversations.
+				IMD-grounded voice weather for farmers, fishermen, and disaster
+				managers — powered by Agora&apos;s Conversational AI engine.
 			</p>
 
 			<Button

@@ -12,6 +12,8 @@ type QuickstartConversationLayoutProps = {
 	visualizer: ReactNode;
 	controls: ReactNode;
 	onEndConversation: () => void;
+	/** Phase 2: IMD source attribution card under the transcript (optional). */
+	imdSourceCard?: ReactNode;
 };
 
 export function QuickstartConversationLayout({
@@ -21,6 +23,7 @@ export function QuickstartConversationLayout({
 	visualizer,
 	controls,
 	onEndConversation,
+	imdSourceCard,
 }: QuickstartConversationLayoutProps) {
 	return (
 		<div className="flex min-h-0 flex-1 flex-col text-left">
@@ -35,7 +38,10 @@ export function QuickstartConversationLayout({
 					/>
 					<div className="flex min-w-0 flex-col justify-center gap-1">
 						<span className="truncate text-lg font-semibold leading-none tracking-[-0.025em] text-foreground">
-							Agora Conversational AI
+							WeatherGPT
+						</span>
+						<span className="truncate text-xs text-muted-foreground">
+							IMD-grounded voice assistant · Agora Conversational AI
 						</span>
 						{pipelineMetrics}
 					</div>
@@ -57,8 +63,11 @@ export function QuickstartConversationLayout({
 			</header>
 
 			<div className="flex min-h-0 w-full flex-1 flex-col gap-4 px-4 pb-4 pt-4 md:px-6 lg:flex-row lg:gap-0">
-				<aside className="order-2 h-64 min-h-0 w-full shrink-0 lg:order-1 lg:h-full lg:w-[26rem]">
-					{transcriptPanel}
+				<aside className="order-2 flex min-h-0 w-full shrink-0 flex-col gap-4 lg:order-1 lg:h-full lg:w-[26rem] lg:overflow-y-auto">
+					<div className="h-64 min-h-0 shrink-0 lg:h-96 lg:flex-1">
+						{transcriptPanel}
+					</div>
+					{imdSourceCard}
 				</aside>
 
 				<main className="order-1 flex min-h-0 flex-1 flex-col lg:order-2 lg:border-l lg:border-border/80 lg:pl-6">

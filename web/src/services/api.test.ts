@@ -1,6 +1,6 @@
 import { afterEach, expect, test } from 'bun:test'
 
-import { getConfig, startAgent, stopAgent } from './api'
+import { getConfig, interruptAgent, startAgent, stopAgent } from './api'
 
 const originalFetch = globalThis.fetch
 let lastCall: { url: string; init?: RequestInit }
@@ -49,6 +49,14 @@ test('stopAgent posts the agentId', async () => {
   mockFetch(200, {})
   await stopAgent('agent-1')
   expect(lastCall.url).toContain('/api/stopAgent')
+  expect(JSON.parse(String(lastCall.init?.body))).toEqual({ agentId: 'agent-1' })
+})
+
+test('interruptAgent posts the agentId', async () => {
+  mockFetch(200, {})
+  await interruptAgent('agent-1')
+  expect(lastCall.url).toContain('/api/interruptAgent')
+  expect(lastCall.init?.method).toBe('POST')
   expect(JSON.parse(String(lastCall.init?.body))).toEqual({ agentId: 'agent-1' })
 })
 

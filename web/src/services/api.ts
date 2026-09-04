@@ -90,3 +90,50 @@ export async function stopAgent(agentId: string): Promise<void> {
     throw new Error(error.detail || `HTTP ${response.status}`)
   }
 }
+
+export async function interruptAgent(agentId: string): Promise<void> {
+  if (!agentId) return
+
+  const response = await fetch(`${API_BASE_URL}/interruptAgent`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ agentId }),
+  })
+
+  if (!response.ok) {
+    const error = await response.json()
+    throw new Error(error.detail || `HTTP ${response.status}`)
+  }
+}
+
+export async function getAgentHistory(agentId: string): Promise<unknown> {
+  const response = await fetch(
+    `${API_BASE_URL}/agentHistory?agentId=${encodeURIComponent(agentId)}`,
+    { method: 'GET' },
+  )
+
+  if (!response.ok) {
+    const error = await response.json()
+    throw new Error(error.detail || `HTTP ${response.status}`)
+  }
+  return response.json()
+}
+
+export async function getAgentTurns(
+  agentId: string,
+  options?: { pageIndex?: number; pageSize?: number },
+): Promise<unknown> {
+  const params = new URLSearchParams({ agentId })
+  if (options?.pageIndex !== undefined) params.set('pageIndex', String(options.pageIndex))
+  if (options?.pageSize !== undefined) params.set('pageSize', String(options.pageSize))
+
+  const response = await fetch(`${API_BASE_URL}/agentTurns?${params.toString()}`, {
+    method: 'GET',
+  })
+
+  if (!response.ok) {
+    const error = await response.json()
+    throw new Error(error.detail || `HTTP ${response.status}`)
+  }
+  return response.json()
+}

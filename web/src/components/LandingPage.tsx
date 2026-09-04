@@ -8,6 +8,7 @@ import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { LoadingSkeleton } from "@/components/LoadingSkeleton";
 import { QuickstartPreCallCard } from "@/components/QuickstartPreCallCard";
+import { VoiceSettingsPanel } from "@/components/VoiceSettingsPanel";
 import { ShareButton } from "@/components/share-button";
 import { getConfig, startAgent, stopAgent } from "@/services/api";
 import type { AgoraRenewalTokens, AgoraTokenData } from "@/types/conversation";
@@ -205,11 +206,14 @@ export default function LandingPage() {
 					}`}
 				>
 					{!showConversation ? (
-						<QuickstartPreCallCard
-							isLoading={isLoading}
-							error={error}
-							onStartConversation={handleStartConversation}
-						/>
+						<div className="flex flex-col items-center gap-4">
+							<QuickstartPreCallCard
+								isLoading={isLoading}
+								error={error}
+								onStartConversation={handleStartConversation}
+							/>
+							<VoiceSettingsPanel />
+						</div>
 					) : agoraData && rtmClient ? (
 						<>
 							{agentJoinError ? (
