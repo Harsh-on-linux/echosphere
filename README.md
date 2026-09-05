@@ -1,63 +1,88 @@
-# Agora Conversational AI Python Quickstart
+# WeatherGPT — Voice-Native IMD Assistant
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 [![Python](https://img.shields.io/badge/python-%3E%3D3.10-blue)](https://www.python.org/)
 [![Bun](https://img.shields.io/badge/bun-latest-black)](https://bun.sh/)
 
-Build a production-style voice agent with a Next.js web client and Python FastAPI backend. This quickstart includes live transcript, agent visualizer ([Agent UIKit](https://agoraio-conversational-ai.github.io/agent-uikit/)), and managed STT/LLM/TTS defaults.
+Voice-native IMD (India Meteorological Department) weather assistant powered by the Agora Conversational AI Engine, Next.js web client, and Python FastAPI backend. Features specialized personas (farmer, fisherman, disaster relief), real-time weather alerts, Cyclone eAtlas maps, and regional language support (Hindi, Bhojpuri, Marathi, and more).
 
 ## Prerequisites
 
 - [Python 3.10+](https://www.python.org/)
 - [Bun](https://bun.sh/)
-- [Agora CLI](https://github.com/AgoraIO/cli)
+- [Agora CLI](https://github.com/AgoraIO/cli) (optional, for project doctor and credential export)
 
-## Run It
+## Starting the Project
 
-Install the CLI (skip if already installed), scaffold the Python quickstart, install dependencies, and run.
+### 1. Quick Start (Run Everything)
 
-1. **Install the Agora CLI and sign in** (skip if `agora` is already on your PATH):
-
-   ```bash
-   curl -fsSL https://raw.githubusercontent.com/AgoraIO/cli/main/install.sh | sh -s -- --add-to-path
-   agora login
-   ```
-
-2. **Scaffold and run** (replace `my-python-demo` with your own project name):
-
-   ```bash
-   agora init my-python-demo --template python
-   cd my-python-demo
-   bun run setup
-   bun run dev
-   ```
-
-3. Open [http://localhost:3000](http://localhost:3000) and click **Start conversation**.
-
-If the agent does not join or transcripts do not appear, run **`agora project doctor --deep`** to check credentials, feature enablement, network reachability, and local env binding.
-
-### Working from a clone of this repository
-
-Use this path if you already cloned **this** repo:
+To start both the FastAPI backend and Next.js frontend concurrently with one command:
 
 ```bash
-git clone https://github.com/AgoraIO-Conversational-AI/agent-quickstart-python.git
-cd agent-quickstart-python
-agora login
-agora project use <your-project>
-bun run setup
-agora quickstart env write .
-bun run doctor:local
 bun run dev
 ```
 
-`bun run setup` preserves a configured `server/.env`, copies a legacy `server/.env.local` when needed, and prints the credential-writing step when the resulting file lacks real Agora values. Setup and `doctor:local` replace an untouched example file with configured legacy credentials. This supports CLI versions that wrote `.env.local`.
+This starts:
+- **Frontend:** [http://localhost:3000](http://localhost:3000)
+- **Backend API:** [http://localhost:8000](http://localhost:8000)
+- **Interactive API Docs:** [http://localhost:8000/docs](http://localhost:8000/docs)
+- **Health Check:** [http://localhost:8000/health](http://localhost:8000/health)
+- **FastMCP Endpoint:** [http://localhost:8000/mcp](http://localhost:8000/mcp)
 
-Services:
+### 2. Starting Services Separately
 
-- Frontend: `http://localhost:3000`
-- Backend: `http://localhost:8000`
-- API docs: `http://localhost:8000/docs`
+If you prefer to run services in separate terminal windows for isolated logs and debugging:
+
+#### Backend (FastAPI + Agora Agent + FastMCP)
+```bash
+# Cross-platform (Windows / macOS / Linux):
+bun run backend
+
+# Or via Python directly:
+# Linux / macOS:
+cd server && source venv/bin/activate && python src/server.py
+
+# Windows (PowerShell):
+cd server; .\venv\Scripts\python.exe src\server.py
+```
+
+#### Frontend (Next.js 16 + React 19 + Agora Agent UIKit)
+```bash
+# Cross-platform (Windows / macOS / Linux):
+bun run frontend
+
+# Or directly in web/:
+cd web && bun run dev
+```
+
+### 3. First-Time Setup & Installation
+
+If running for the first time or after a fresh git clone:
+
+```bash
+# Install root and workspace dependencies
+bun install
+
+# Prepare environment files and python dependencies
+bun run setup
+```
+
+Configure your Agora credentials in `server/.env`:
+```bash
+AGORA_APP_ID=your_agora_app_id
+AGORA_APP_CERTIFICATE=your_agora_app_certificate
+```
+
+### 4. Verification
+
+Confirm both services are running and healthy:
+```bash
+# Check backend health
+curl http://localhost:8000/health
+
+# Check API proxy through frontend
+curl http://localhost:3000/api/get_config
+```
 
 ## Deploy
 
@@ -132,24 +157,21 @@ Primary backend env file: [`server/.env.example`](server/.env.example).
 ## Commands
 
 ```bash
-# Dev
-bun run setup
-bun run dev
+# Starting the app
+bun run dev             # Start both backend (8000) and frontend (3000) concurrently
+bun run backend         # Start FastAPI backend standalone
+bun run frontend        # Start Next.js frontend standalone
 
-# Quality
-bun run doctor
-bun run doctor:local
-bun run verify:backend
+# Setup & Environment
+bun run setup           # Run full setup (env files + dependencies)
+bun run setup:env       # Prepare server/.env from template
 
-# CI / pre-ship
-bun run verify:web
-bun run verify:local
-bun run verify
+# Quality & Verification
+bun run verify          # Full web verification (doctor + contracts + build)
+bun run verify:backend  # Python syntax/compilation checks
+pytest server/tests     # Run 200+ backend unit and integration tests
+bun test                # Run frontend unit tests (in web/)
 ```
-
-Run `bun run verify` before shipping web-only changes, and `bun run verify:local` when backend behavior changed.
-
-Tests run standalone (no Agora cloud needed): `pytest` in `server/`, `bun test` in `web/`. CI runs them on Linux/macOS/Windows × Python 3.10 & 3.13.
 
 ## Architecture
 
