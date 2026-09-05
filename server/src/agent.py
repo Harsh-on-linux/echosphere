@@ -216,6 +216,8 @@ class Agent:
         output_audio_codec: Optional[str] = None,
         language: Optional[str] = None,
         persona: Optional[str] = None,
+        lat: Optional[float] = None,
+        lon: Optional[float] = None,
     ) -> Dict[str, Any]:
         """Start agent with the same default vendor chain as the Next.js quickstart."""
         if not channel_name or not str(channel_name).strip():
@@ -240,6 +242,20 @@ class Agent:
         voice_persona = normalize_persona(persona)
         instructions = get_system_prompt(voice_persona)
         tts_rate = PERSONA_TTS_RATE.get(voice_persona, 1.0)
+
+        # Phase 1.3: Geolocation handshake — inject GPS coordinates and nearest region into instructions
+        if lat is not None and lon is not None:
+            try:
+                from location_resolver import find_nearest_location
+                nearest = find_nearest_location(lat, lon)
+                if nearest:
+                    place = nearest.get("tehsil") or nearest["district_name"]
+                    instructions += (
+                        f"\nUser GPS coordinates: ({lat:.4f}, {lon:.4f}), nearest region: {place}, {nearest['state']}. "
+                        f"Assume this location by default unless the user specifies otherwise."
+                    )
+            except Exception:
+                pass
 
         # Default managed path: DeepgramSTT + OpenAI + MiniMaxTTS (plan.md 2.1).
         # Managed = included in the $0.10/min Conv AI price, inside 300 free mins.

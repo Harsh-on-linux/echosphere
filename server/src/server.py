@@ -239,6 +239,8 @@ class StartAgentRequest(BaseModel):
     parameters: Optional[Dict[str, Any]] = None
     language: Optional[str] = None
     persona: Optional[str] = None
+    lat: Optional[float] = None
+    lon: Optional[float] = None
 
 
 class StopAgentRequest(BaseModel):
@@ -390,6 +392,8 @@ async def start_agent(request: StartAgentRequest):
             output_audio_codec=output_audio_codec,
             language=request.language,
             persona=request.persona,
+            lat=request.lat,
+            lon=request.lon,
         )
         return {"code": 0, "msg": "success", "data": result}
     except Exception as e:

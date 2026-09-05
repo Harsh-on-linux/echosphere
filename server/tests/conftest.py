@@ -45,11 +45,13 @@ class FakeAgent:
         self.telephony_enabled = False
         self.dial_calls = []
         self.hangup_calls = []
+        self.started_coords = []
 
     async def start(self, channel_name, agent_uid, user_uid, output_audio_codec=None,
-                    language=None, persona=None):
+                    language=None, persona=None, lat=None, lon=None, **kwargs):
         self.started.append((channel_name, agent_uid, user_uid, output_audio_codec,
                              language, persona))
+        self.started_coords.append((lat, lon))
         return {
             "agent_id": f"fake-agent-{agent_uid}",
             "channel_name": channel_name,

@@ -8,12 +8,18 @@ type QuickstartPreCallCardProps = {
 	isLoading: boolean;
 	error: string | null;
 	onStartConversation: () => void;
+	coords?: { lat: number; lon: number } | null;
+	onToggleLocation?: () => void;
+	isLocating?: boolean;
 };
 
 export function QuickstartPreCallCard({
 	isLoading,
 	error,
 	onStartConversation,
+	coords,
+	onToggleLocation,
+	isLocating = false,
 }: QuickstartPreCallCardProps) {
 	return (
 		<div
@@ -31,10 +37,37 @@ export function QuickstartPreCallCard({
 				managers — powered by Agora&apos;s Conversational AI engine.
 			</p>
 
+			{onToggleLocation ? (
+				<button
+					type="button"
+					onClick={onToggleLocation}
+					disabled={isLoading || isLocating}
+					className="mt-4 flex items-center gap-2 rounded-full border border-border/70 bg-secondary/50 px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-secondary"
+					aria-label="Toggle GPS auto-location"
+				>
+					{isLocating ? (
+						<>
+							<Loader2 className="h-3 w-3 animate-spin text-primary" />
+							<span>Detecting GPS...</span>
+						</>
+					) : coords ? (
+						<>
+							<span className="text-emerald-400">📍</span>
+							<span>GPS: {coords.lat.toFixed(2)}°N, {coords.lon.toFixed(2)}°E</span>
+						</>
+					) : (
+						<>
+							<span className="text-muted-foreground">📍</span>
+							<span>Enable GPS Auto-Location</span>
+						</>
+					)}
+				</button>
+			) : null}
+
 			<Button
 				onClick={onStartConversation}
 				disabled={isLoading}
-				className="mt-12 h-10 w-full rounded-lg border border-primary bg-primary text-sm font-medium text-black hover:border-white hover:bg-white hover:text-black disabled:hover:border-primary disabled:hover:bg-primary disabled:hover:text-black"
+				className="mt-8 h-10 w-full rounded-lg border border-primary bg-primary text-sm font-medium text-black hover:border-white hover:bg-white hover:text-black disabled:hover:border-primary disabled:hover:bg-primary disabled:hover:text-black"
 				aria-label={
 					isLoading
 						? "Starting conversation with AI agent"

@@ -218,3 +218,50 @@ def resolve_with_fallback(location_text: str, threshold: int = 70) -> Dict[str, 
 
 def all_districts() -> List[Dict[str, Any]]:
     return _load_districts()
+
+
+def find_nearest_location(lat: float, lon: float) -> Optional[Dict[str, Any]]:
+    """Resolve GPS coordinates to nearest district/tehsil."""
+    districts = _load_districts()
+    if not districts:
+        return None
+    import math
+    best_dist = float("inf")
+    best_loc = None
+    for d in districts:
+        d_lat = d.get("lat")
+        d_lon = d.get("lon")
+        if d_lat is not None and d_lon is not None:
+            dist = math.hypot(lat - d_lat, lon - d_lon)
+            if dist < best_dist:
+                best_dist = dist
+                best_loc = {
+                    "district_id": d["district_id"],
+                    "district_name": d["district_name"],
+                    "state": d["state"],
+                    "coastal": d.get("coastal"),
+                    "agro_zone": d.get("agro_zone"),
+                    "lat": d_lat,
+                    "lon": d_lon,
+                    "distance_deg": round(dist, 4),
+                }
+        for t in d.get("tehsils", []):
+            t_lat = t.get("lat")
+            t_lon = t.get("lon")
+            if t_lat is not None and t_lon is not None:
+                dist = math.hypot(lat - t_lat, lon - t_lon)
+                if dist < best_dist:
+                    best_dist = dist
+                    best_loc = {
+                        "district_id": d["district_id"],
+                        "district_name": d["district_name"],
+                        "state": d["state"],
+                        "tehsil": t["name"],
+                        "coastal": d.get("coastal"),
+                        "agro_zone": d.get("agro_zone"),
+                        "lat": t_lat,
+                        "lon": t_lon,
+                        "distance_deg": round(dist, 4),
+                    }
+    return best_loc
+

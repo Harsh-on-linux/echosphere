@@ -62,6 +62,21 @@ def test_start_agent_forwards_output_audio_codec(client):
     assert client.fake_agent.started[-1] == ("ch", 111, 222, "opus", None, None)
 
 
+def test_start_agent_forwards_gps_coordinates(client):
+    response = client.post(
+        "/startAgent",
+        json={
+            "channelName": "ch",
+            "rtcUid": 111,
+            "userUid": 222,
+            "lat": 18.5204,
+            "lon": 73.8567,
+        },
+    )
+    assert response.status_code == 200
+    assert client.fake_agent.started_coords[-1] == (18.5204, 73.8567)
+
+
 def test_stop_agent(client):
     response = client.post("/stopAgent", json={"agentId": "fake-agent-111"})
     assert response.status_code == 200

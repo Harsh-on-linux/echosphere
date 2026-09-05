@@ -100,8 +100,34 @@ export default function LandingPage() {
 	const [agentJoinError, setAgentJoinError] = useState(false);
 	// Phase 4.2: pre-call voice preference -> startAgent language/persona.
 	const [voiceSettings, setVoiceSettings] = useState<VoiceSettings | null>(null);
+	// Phase 1.3: GPS Geolocation state
+	const [coords, setCoords] = useState<{ lat: number; lon: number } | null>(null);
+	const [isLocating, setIsLocating] = useState(false);
 	// Phase 6.2: session start for the persisted history snapshot.
 	const startedAtRef = useRef<number>(0);
+
+	const handleToggleLocation = () => {
+		if (coords) {
+			setCoords(null);
+			return;
+		}
+		if (typeof window === "undefined" || !navigator.geolocation) {
+			setError("Geolocation is not supported by your browser");
+			return;
+		}
+		setIsLocating(true);
+		navigator.geolocation.getCurrentPosition(
+			(pos) => {
+				setCoords({ lat: pos.coords.latitude, lon: pos.coords.longitude });
+				setIsLocating(false);
+			},
+			(err) => {
+				console.warn("GPS lookup failed:", err.message);
+				setIsLocating(false);
+			},
+			{ timeout: 10000, enableHighAccuracy: true },
+		);
+	};
 
 	useEffect(() => {
 		import("agora-rtc-react").catch(() => {});
@@ -144,6 +170,8 @@ export default function LandingPage() {
 					{
 						language: voiceSettings?.asrLanguage,
 						persona: voiceSettings?.persona,
+						lat: coords?.lat,
+						lon: coords?.lon,
 					},
 				).catch((err) => {
 					console.error("Failed to start conversation with agent:", err);
@@ -268,6 +296,9 @@ export default function LandingPage() {
 								isLoading={isLoading}
 								error={error}
 								onStartConversation={handleStartConversation}
+								coords={coords}
+								onToggleLocation={handleToggleLocation}
+								isLocating={isLocating}
 							/>
 							<VoiceSettingsPanel onChange={setVoiceSettings} />
 							<SessionHistoryPanel />
