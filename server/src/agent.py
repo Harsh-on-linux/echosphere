@@ -283,6 +283,12 @@ class Agent:
         )
         greeting = get_greeting(voice_language)
         turn_language = TURN_DETECTION_LANGUAGE.get(voice_language, "en-US")
+        try:
+            from agora_agent.agentkit.agent import _is_turn_detection_language
+            if not _is_turn_detection_language(turn_language):
+                turn_language = "hi-IN" if voice_language in INDIC_LANGUAGES else "en-US"
+        except Exception:
+            pass
         # Phase 4.2 — persona hint selects the system prompt + TTS rate.
         voice_persona = normalize_persona(persona)
         instructions = get_system_prompt(voice_persona)

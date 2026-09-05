@@ -99,3 +99,18 @@ def test_english_with_sarvam_voice_activates_sarvam(fake_env, monkeypatch):
     assert captured["tts"]["params"]["model"] == "bulbul:v3"
     assert captured["tts"]["params"]["target_language_code"] == "en-IN"
 
+
+def test_marathi_with_key_uses_sarvam_and_maps_turn_detection_to_hi(fake_env, monkeypatch):
+    monkeypatch.setenv("SARVAM_API_KEY", "test-key")
+    agent_mod, captured, result = _start(fake_env, monkeypatch, language="mr-IN")
+    assert result["language"] == "mr-IN"
+    assert result["stt"] == "sarvam" and result["tts"] == "sarvam"
+    assert captured["stt"] == {"vendor": "sarvam", "params": {"api_key": "test-key", "language": "mr-IN"}}
+    assert captured["tts"]["vendor"] == "sarvam"
+    assert captured["tts"]["params"]["target_language_code"] == "mr-IN"
+    assert captured["tts"]["params"]["speaker"] == "priya"
+    assert captured["tts"]["params"]["model"] == "bulbul:v3"
+    assert captured["config"]["turn_detection"]["language"] == "hi-IN"
+    assert captured["config"]["greeting"] == persona_prompt.GREETINGS["mr-IN"]
+
+

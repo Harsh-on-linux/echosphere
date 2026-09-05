@@ -57,12 +57,13 @@ _LANGUAGE_ALIASES = {
 
 # turn_detection language per voice language (AGENTS.md #6: set together
 # with asr.params.language). "auto" uses Sarvam `unknown` for STT and keeps
-# VAD on en-US.
+# VAD on en-US. Agora turn_detection supports bn-IN, en-IN, gu-IN, hi-IN, kn-IN,
+# ta-IN, te-IN; unsupported Indic languages (mr-IN) safely map to hi-IN.
 TURN_DETECTION_LANGUAGE = {
     "en-IN": "en-US",
     "hi-IN": "hi-IN",
     "ta-IN": "ta-IN",
-    "mr-IN": "mr-IN",
+    "mr-IN": "hi-IN",
     "bn-IN": "bn-IN",
     "auto": "en-US",
 }
