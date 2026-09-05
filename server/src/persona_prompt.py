@@ -30,6 +30,7 @@ DISASTER_PROMPT = """You serve disaster managers — prioritize cyclone_track + 
 GREETINGS = {
     "en-IN": "Hello, I am WeatherGPT. Which district's weather do you need?",
     "hi-IN": "Namaste, main WeatherGPT hun. Kaun se jile ka mausam janna hai?",
+    "bho-IN": "Pranam, hum WeatherGPT haeen. Rauwa kavan jila ke mausam jaane ke chahat baani?",
     "ta-IN": "Vanakkam, naan WeatherGPT. Endha mavattam vaanilai vendum?",
     "mr-IN": "Namaskar, mi WeatherGPT ahe. Konatya jilhyacha hawaman havay?",
     "bn-IN": "Namaskar, ami WeatherGPT. Kon jelar abhawa jante chan?",
@@ -37,10 +38,10 @@ GREETINGS = {
 
 # Phase 4.1 — Indic pipeline languages (plan.md 4.1, research.md #12).
 # en-IN runs managed (Deepgram + MiniMax, inside 300 free mins).
-# hi/ta/mr/bn-IN run Sarvam BYOK (STT+TTS) when SARVAM_API_KEY is set,
+# hi/ta/mr/bn/bho-IN run Sarvam BYOK (STT+TTS) when SARVAM_API_KEY is set,
 # else fall back to the managed English loop — never fail a session.
-SUPPORTED_LANGUAGES = ("en-IN", "hi-IN", "ta-IN", "mr-IN", "bn-IN")
-INDIC_LANGUAGES = ("hi-IN", "ta-IN", "mr-IN", "bn-IN")
+SUPPORTED_LANGUAGES = ("en-IN", "hi-IN", "bho-IN", "ta-IN", "mr-IN", "bn-IN")
+INDIC_LANGUAGES = ("hi-IN", "bho-IN", "ta-IN", "mr-IN", "bn-IN")
 DEFAULT_LANGUAGE = "en-IN"
 SARVAM_SPEAKER = "priya"
 SARVAM_MODEL = "bulbul:v3"
@@ -49,6 +50,7 @@ SARVAM_MODEL = "bulbul:v3"
 _LANGUAGE_ALIASES = {
     "en": "en-IN", "english": "en-IN",
     "hi": "hi-IN", "hindi": "hi-IN",
+    "bho": "bho-IN", "bhojpuri": "bho-IN",
     "ta": "ta-IN", "tamil": "ta-IN",
     "mr": "mr-IN", "marathi": "mr-IN",
     "bn": "bn-IN", "bengali": "bn-IN", "bangla": "bn-IN",
@@ -58,10 +60,11 @@ _LANGUAGE_ALIASES = {
 # turn_detection language per voice language (AGENTS.md #6: set together
 # with asr.params.language). "auto" uses Sarvam `unknown` for STT and keeps
 # VAD on en-US. Agora turn_detection supports bn-IN, en-IN, gu-IN, hi-IN, kn-IN,
-# ta-IN, te-IN; unsupported Indic languages (mr-IN) safely map to hi-IN.
+# ta-IN, te-IN; unsupported Indic languages (mr-IN, bho-IN) safely map to hi-IN.
 TURN_DETECTION_LANGUAGE = {
     "en-IN": "en-US",
     "hi-IN": "hi-IN",
+    "bho-IN": "hi-IN",
     "ta-IN": "ta-IN",
     "mr-IN": "hi-IN",
     "bn-IN": "bn-IN",

@@ -318,6 +318,13 @@ class Agent:
             except Exception:
                 pass
 
+        if voice_language == "bho-IN":
+            instructions += (
+                "\n\nLanguage instruction: The caller is speaking Bhojpuri (भोजपुरी). "
+                "Respond in warm, respectful, conversational Bhojpuri in Devanagari script (e.g. use रउआ, हमार, बानी, हईं, का हाल बा, बरखा होई, पाला, तेज हवा). "
+                "Keep answers short, practical, and clear for rural farmers and villagers."
+            )
+
         # Default managed path: DeepgramSTT + OpenAI + MiniMaxTTS (plan.md 2.1).
         # Managed = included in the $0.10/min Conv AI price, inside 300 free mins.
         # Phase 3.3: attach IMD MCP so the LLM can call resolve_location +
@@ -337,8 +344,18 @@ class Agent:
             llm_kwargs["mcp_servers"] = mcp_servers
         llm = OpenAI(**llm_kwargs)
         if use_sarvam:
-            stt_language = "unknown" if voice_language == "auto" else voice_language
-            tts_language = "en-IN" if voice_language in ("auto", "en", "en-IN") else voice_language
+            if voice_language == "bho-IN":
+                stt_language = "hi-IN"
+                tts_language = "hi-IN"
+            elif voice_language == "auto":
+                stt_language = "unknown"
+                tts_language = "en-IN"
+            elif voice_language in ("en", "en-IN"):
+                stt_language = voice_language
+                tts_language = "en-IN"
+            else:
+                stt_language = voice_language
+                tts_language = voice_language
             speaker = SARVAM_SPEAKER
             if voice:
                 v_clean = voice.strip().lower()

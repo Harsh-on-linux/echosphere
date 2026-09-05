@@ -11,6 +11,7 @@ import persona_prompt
 @pytest.mark.parametrize("raw,expected", [
     (None, "en-IN"), ("", "en-IN"), ("en-IN", "en-IN"), ("en", "en-IN"),
     ("hi", "hi-IN"), ("hi-IN", "hi-IN"), ("Hindi", "hi-IN"),
+    ("bho", "bho-IN"), ("bhojpuri", "bho-IN"), ("bho-IN", "bho-IN"),
     ("ta", "ta-IN"), ("tamil", "ta-IN"), ("mr", "mr-IN"), ("marathi", "mr-IN"),
     ("bn", "bn-IN"), ("bangla", "bn-IN"), ("auto", "auto"),
     ("xx-YY", "en-IN"),
@@ -19,7 +20,7 @@ def test_normalize_language(raw, expected):
     assert persona_prompt.normalize_language(raw) == expected
 
 
-@pytest.mark.parametrize("lang", ["en-IN", "hi-IN", "ta-IN", "mr-IN", "bn-IN"])
+@pytest.mark.parametrize("lang", ["en-IN", "hi-IN", "bho-IN", "ta-IN", "mr-IN", "bn-IN"])
 def test_greeting_per_language(lang):
     assert persona_prompt.get_greeting(lang) == persona_prompt.GREETINGS[lang]
 
@@ -112,5 +113,25 @@ def test_marathi_with_key_uses_sarvam_and_maps_turn_detection_to_hi(fake_env, mo
     assert captured["tts"]["params"]["model"] == "bulbul:v3"
     assert captured["config"]["turn_detection"]["language"] == "hi-IN"
     assert captured["config"]["greeting"] == persona_prompt.GREETINGS["mr-IN"]
+
+
+def test_bhojpuri_with_key_uses_sarvam_with_hi_targets(fake_env, monkeypatch):
+    monkeypatch.setenv("SARVAM_API_KEY", "test-key")
+    agent_mod, captured, result = _start(fake_env, monkeypatch, language="bho-IN")
+    assert result["language"] == "bho-IN"
+    assert result["stt"] == "sarvam" and result["tts"] == "sarvam"
+    # Sarvam STT & TTS use hi-IN code for Bhojpuri Devanagari phonetics
+    assert captured["stt"] == {"vendor": "sarvam", "params": {"api_key": "test-key", "language": "hi-IN"}}
+    assert captured["tts"]["vendor"] == "sarvam"
+    assert captured["tts"]["params"]["target_language_code"] == "hi-IN"
+    assert captured["tts"]["params"]["speaker"] == "priya"
+    assert captured["tts"]["params"]["model"] == "bulbul:v3"
+    # Agora turn detection uses hi-IN
+    assert captured["config"]["turn_detection"]["language"] == "hi-IN"
+    assert captured["config"]["greeting"] == persona_prompt.GREETINGS["bho-IN"]
+    # LLM instructions receive Bhojpuri language guidance
+    instructions = captured["config"]["instructions"]
+    assert "Bhojpuri" in instructions or "भोजपुरी" in instructions
+
 
 

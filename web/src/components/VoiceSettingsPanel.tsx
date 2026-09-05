@@ -4,10 +4,11 @@ import { useEffect, useState } from "react";
 
 const ASR_LANGUAGES = [
   { value: "en-IN", label: "English (India)" },
-  { value: "hi-IN", label: "Hindi" },
-  { value: "ta-IN", label: "Tamil" },
-  { value: "mr-IN", label: "Marathi" },
-  { value: "bn-IN", label: "Bengali" },
+  { value: "hi-IN", label: "Hindi (हिंदी)" },
+  { value: "bho-IN", label: "Bhojpuri (भोजपुरी)" },
+  { value: "ta-IN", label: "Tamil (தமிழ்)" },
+  { value: "mr-IN", label: "Marathi (मराठी)" },
+  { value: "bn-IN", label: "Bengali (বাংলা)" },
 ] as const;
 
 const TTS_VOICES = [
