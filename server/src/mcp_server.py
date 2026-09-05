@@ -135,6 +135,31 @@ try:
 
         return await _fn(coastal_district)
 
+    @mcp.tool()
+    async def get_crop_weather_advisory(
+        crop: str,
+        location: str,
+        rainfall_mm: float = 0.0,
+        humidity_percent: float = 65.0,
+        temp_max: float = 30.0,
+        temp_min: float = 20.0,
+        wind_kmh: float = 12.0,
+        growth_stage: Optional[str] = None,
+    ) -> dict:
+        """ICAR-KVK Crop Agro-Advisory: Actionable guidance on pesticide spraying, drainage, and disease risks."""
+        from agro_advisory import evaluate_agro_advisory as _fn
+
+        return await _fn(
+            crop=crop,
+            district_or_location=location,
+            rainfall_mm=rainfall_mm,
+            humidity_percent=humidity_percent,
+            temp_max=temp_max,
+            temp_min=temp_min,
+            wind_kmh=wind_kmh,
+            growth_stage=growth_stage,
+        )
+
 except Exception as e:
     # Graceful fallback for dev without fastmcp installed; keep importable for tests
     mcp = None
