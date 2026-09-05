@@ -68,7 +68,7 @@ def _normalize_crop(crop: str) -> str:
     return "general"
 
 
-async def evaluate_agro_advisory(
+def evaluate_agro_advisory_sync(
     crop: str,
     district_or_location: str,
     rainfall_mm: float = 0.0,
@@ -142,3 +142,28 @@ async def evaluate_agro_advisory(
         "recommended_actions": actions,
         "message": f"Agro-advisory for {crop.capitalize()}{stage_note}: Spraying {'PERMITTED' if spraying_safe else 'NOT RECOMMENDED'}. {actions[0] if actions else ''}",
     }
+
+
+async def evaluate_agro_advisory(
+    crop: str,
+    district_or_location: str,
+    rainfall_mm: float = 0.0,
+    humidity_percent: float = 65.0,
+    temp_max: float = 30.0,
+    temp_min: float = 20.0,
+    wind_kmh: float = 12.0,
+    growth_stage: Optional[str] = None,
+) -> Dict[str, Any]:
+    return evaluate_agro_advisory_sync(
+        crop=crop,
+        district_or_location=district_or_location,
+        rainfall_mm=rainfall_mm,
+        humidity_percent=humidity_percent,
+        temp_max=temp_max,
+        temp_min=temp_min,
+        wind_kmh=wind_kmh,
+        growth_stage=growth_stage,
+    )
+
+
+generate_agro_advisory = evaluate_agro_advisory_sync

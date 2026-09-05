@@ -193,6 +193,13 @@ try:
 
         return _fn(phone_number, crop_name=crop_name, growth_stage=stage)
 
+    @mcp.tool()
+    async def get_regional_weather_bulletin(district_name: str, language: str = "hi-IN", persona: str = "farmer") -> dict:
+        """Retrieve pre-synthesized 30-second localized weather audio bulletin script and cached audio URL."""
+        from bulletin_cache import get_or_create_cached_bulletin as _fn
+
+        return _fn(district_name=district_name, language=language, persona=persona)
+
 except Exception as e:
     # Graceful fallback for dev without fastmcp installed; keep importable for tests
     mcp = None

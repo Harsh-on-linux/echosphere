@@ -671,6 +671,23 @@ async def add_crop_to_profile(request: AddCropRequest):
     return {"code": 0, "msg": "success", "data": user}
 
 
+# --- Regional Audio Bulletin Cache (Phase 6) ---
+
+@router.get("/api/regionalBulletin")
+async def get_regional_bulletin(
+    district: str = Query(..., description="District name"),
+    language: Optional[str] = Query(default="hi-IN", description="Language code"),
+    persona: Optional[str] = Query(default="farmer", description="User persona"),
+):
+    from bulletin_cache import get_or_create_cached_bulletin
+    bulletin = get_or_create_cached_bulletin(
+        district_name=district,
+        language=language or "hi-IN",
+        persona=persona or "farmer",
+    )
+    return {"code": 0, "msg": "success", "data": bulletin}
+
+
 app.include_router(router)
 
 # Mount AFTER the REST router so /health, /get_config, /startAgent etc. keep
