@@ -90,9 +90,15 @@ export function VoiceSettingsPanel({
         <select
           className="h-9 rounded-md border border-border bg-background px-2 text-sm text-foreground"
           value={settings.asrLanguage}
-          onChange={(event) =>
-            setSettings((prev) => ({ ...prev, asrLanguage: event.target.value }))
-          }
+          onChange={(event) => {
+            const nextLang = event.target.value;
+            const isIndic = nextLang !== "en-IN";
+            setSettings((prev) => ({
+              ...prev,
+              asrLanguage: nextLang,
+              ttsVoice: isIndic ? "anushka" : prev.ttsVoice,
+            }));
+          }}
           aria-label="ASR language"
         >
           {ASR_LANGUAGES.map((option) => (

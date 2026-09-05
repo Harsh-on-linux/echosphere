@@ -452,7 +452,7 @@ export default function ConversationComponent({
 					onToggle={() => setIsConnectionDetailsOpen((open) => !open)}
 				/>
 			}
-			pipelineMetrics={<QuickstartPipelineMetrics metrics={agentMetrics} />}
+			pipelineMetrics={<QuickstartPipelineMetrics metrics={agentMetrics} sttVendor={agoraData.sttVendor} ttsVendor={agoraData.ttsVendor} />}
 			transcriptPanel={
 				<QuickstartTranscriptPanel
 					messageList={messageList}

@@ -172,6 +172,7 @@ export default function LandingPage() {
 						persona: voiceSettings?.persona,
 						lat: coords?.lat,
 						lon: coords?.lon,
+						voice: voiceSettings?.ttsVoice,
 					},
 				).catch((err) => {
 					console.error("Failed to start conversation with agent:", err);
@@ -190,6 +191,10 @@ export default function LandingPage() {
 
 		setRtmClient(rtm);
 		startedAtRef.current = Date.now();
+		const isSarvam =
+			voiceSettings?.ttsVoice === "anushka" ||
+			(Boolean(voiceSettings?.asrLanguage) && voiceSettings?.asrLanguage !== "en-IN");
+
 		setAgoraData({
 				token: config.token,
 				uid: config.uid,
@@ -197,6 +202,8 @@ export default function LandingPage() {
 				appId: config.app_id,
 				agentUid: config.agent_uid,
 				agentId: agentIdResult,
+				sttVendor: isSarvam ? "sarvam" : "deepgram",
+				ttsVendor: isSarvam ? "sarvam" : "minimax",
 			});
 			setShowConversation(true);
 		} catch (nextError) {

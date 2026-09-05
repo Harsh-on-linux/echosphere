@@ -8,6 +8,8 @@ export interface AgoraTokenData {
   agentId?: string;
   appId?: string; // `app_id` returned by backend
   agentUid?: string; // `NEXT_PUBLIC_AGENT_UID`
+  sttVendor?: string;
+  ttsVendor?: string;
 }
 
 export interface AgoraRenewalTokens {

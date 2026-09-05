@@ -242,6 +242,7 @@ class StartAgentRequest(BaseModel):
     lat: Optional[float] = None
     lon: Optional[float] = None
     phoneNumber: Optional[str] = None
+    voice: Optional[str] = None
 
 
 class StopAgentRequest(BaseModel):
@@ -396,6 +397,7 @@ async def start_agent(request: StartAgentRequest):
             lat=request.lat,
             lon=request.lon,
             phone_number=request.phoneNumber,
+            voice=request.voice,
         )
         return {"code": 0, "msg": "success", "data": result}
     except Exception as e:

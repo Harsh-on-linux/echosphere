@@ -59,13 +59,14 @@ export async function startAgent(
   channelName: string,
   rtcUid: number,
   userUid: number,
-  options?: { language?: string; persona?: string; lat?: number; lon?: number },
+  options?: { language?: string; persona?: string; lat?: number; lon?: number; voice?: string },
 ): Promise<string> {
   const payload: Record<string, unknown> = { channelName, rtcUid, userUid }
   if (options?.language) payload.language = options.language
   if (options?.persona) payload.persona = options.persona
   if (options?.lat !== undefined) payload.lat = options.lat
   if (options?.lon !== undefined) payload.lon = options.lon
+  if (options?.voice) payload.voice = options.voice
 
   const response = await fetch(`${API_BASE_URL}/startAgent`, {
     method: 'POST',

@@ -219,6 +219,7 @@ class Agent:
         lat: Optional[float] = None,
         lon: Optional[float] = None,
         phone_number: Optional[str] = None,
+        voice: Optional[str] = None,
     ) -> Dict[str, Any]:
         """Start agent with the same default vendor chain as the Next.js quickstart."""
         if not channel_name or not str(channel_name).strip():
@@ -232,11 +233,17 @@ class Agent:
         # en-IN (or missing Sarvam key): managed Deepgram + MiniMax, inside the
         # $0.10/min bundle and 300 free mins. hi/ta/mr/bn-IN with SARVAM_API_KEY:
         # Sarvam BYOK (₹100 free, code-mixed Hinglish support). "auto" uses
-        # Sarvam `unknown` STT auto-detect. Never fail: without a key, fall
-        # back to the managed English loop.
+        # Sarvam `unknown` STT auto-detect. Selecting Sarvam voice activates
+        # Sarvam STT+TTS even in Indian English (en-IN).
         voice_language = normalize_language(language)
         sarvam_key = (os.getenv("SARVAM_API_KEY") or "").strip()
-        use_sarvam = (voice_language in INDIC_LANGUAGES or voice_language == "auto") and bool(sarvam_key)
+        voice_lower = (voice or "").strip().lower()
+        use_sarvam = bool(sarvam_key) and (
+            voice_language in INDIC_LANGUAGES
+            or voice_language == "auto"
+            or "sarvam" in voice_lower
+            or "anushka" in voice_lower
+        )
         greeting = get_greeting(voice_language)
         turn_language = TURN_DETECTION_LANGUAGE.get(voice_language, "en-US")
         # Phase 4.2 — persona hint selects the system prompt + TTS rate.
@@ -288,9 +295,10 @@ class Agent:
         llm = OpenAI(**llm_kwargs)
         if use_sarvam:
             stt_language = "unknown" if voice_language == "auto" else voice_language
-            tts_language = "en-IN" if voice_language == "auto" else voice_language
+            tts_language = "en-IN" if voice_language in ("auto", "en", "en-IN") else voice_language
+            speaker = "anushka" if ("anushka" in voice_lower or not voice) else voice
             stt = SarvamSTT(api_key=sarvam_key, language=stt_language)
-            tts = SarvamTTS(key=sarvam_key, speaker=SARVAM_SPEAKER,
+            tts = SarvamTTS(key=sarvam_key, speaker=speaker,
                             target_language_code=tts_language, pace=tts_rate)
             stt_name, tts_name = "sarvam", "sarvam"
         else:
@@ -298,6 +306,15 @@ class Agent:
             tts = MiniMaxTTS(model="speech_2_6_turbo", voice_id="English_captivating_female1",
                              speed=tts_rate)
             stt_name, tts_name = "deepgram", "minimax"
+
+        logger.info(
+            "Selected voice pipeline stt=%s tts=%s voice_language=%s voice=%s use_sarvam=%s",
+            stt_name,
+            tts_name,
+            voice_language,
+            voice,
+            use_sarvam,
+        )
 
         # Optional BYOK example: replace the STT block above and set DEEPGRAM_API_KEY.
         # stt = DeepgramSTT(api_key=os.getenv("DEEPGRAM_API_KEY"), model="nova-3", language="en")

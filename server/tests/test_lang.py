@@ -88,3 +88,12 @@ def test_auto_uses_unknown_stt(fake_env, monkeypatch):
     assert result["language"] == "auto"
     assert captured["stt"]["params"]["language"] == "unknown"
     assert captured["tts"]["params"]["target_language_code"] == "en-IN"
+
+
+def test_english_with_sarvam_voice_activates_sarvam(fake_env, monkeypatch):
+    monkeypatch.setenv("SARVAM_API_KEY", "test-key")
+    agent_mod, captured, result = _start(fake_env, monkeypatch, language="en-IN", voice="anushka")
+    assert result["stt"] == "sarvam" and result["tts"] == "sarvam"
+    assert captured["tts"]["params"]["speaker"] == "anushka"
+    assert captured["tts"]["params"]["target_language_code"] == "en-IN"
+
