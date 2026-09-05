@@ -576,6 +576,47 @@ async def telephony_webhook(payload: Dict[str, Any]):
     return {"code": 0, "msg": "received"}
 
 
+# --- WhatsApp & Disaster Broadcast (Phase 4) ---
+
+class DisasterBroadcastRequest(BaseModel):
+    targetNumbers: list[str]
+    bulletinText: str
+    districtName: str
+    language: Optional[str] = "hi-IN"
+
+
+@router.get("/api/whatsapp/webhook")
+async def whatsapp_verify(
+    hub_mode: Optional[str] = Query(default=None, alias="hub.mode"),
+    hub_challenge: Optional[str] = Query(default=None, alias="hub.challenge"),
+    hub_verify_token: Optional[str] = Query(default=None, alias="hub.verify_token"),
+):
+    from whatsapp_service import verify_webhook
+    challenge = verify_webhook(hub_mode, hub_verify_token, hub_challenge)
+    if challenge is not None:
+        return int(challenge) if challenge.isdigit() else challenge
+    raise HTTPException(status_code=403, detail="Verification failed")
+
+
+@router.post("/api/whatsapp/webhook")
+async def whatsapp_incoming(payload: Dict[str, Any]):
+    from whatsapp_service import process_whatsapp_incoming
+    result = await process_whatsapp_incoming(payload)
+    return {"code": 0, "msg": "success", "data": result}
+
+
+@router.post("/api/disasterBroadcast")
+async def disaster_broadcast(request: DisasterBroadcastRequest):
+    from whatsapp_service import trigger_disaster_obd_broadcast
+    result = await trigger_disaster_obd_broadcast(
+        target_numbers=request.targetNumbers,
+        bulletin_text=request.bulletinText,
+        district_name=request.districtName,
+        language=request.language or "hi-IN",
+    )
+    return {"code": 0, "msg": "success", "data": result}
+
+
 app.include_router(router)
 
 # Mount AFTER the REST router so /health, /get_config, /startAgent etc. keep
