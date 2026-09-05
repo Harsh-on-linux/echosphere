@@ -114,6 +114,27 @@ try:
 
         return await _fn(lat, lon)
 
+    @mcp.tool()
+    async def get_ocean_state_forecast(coastal_district: str) -> dict:
+        """INCOIS Ocean State Forecast: wave height, swell period, currents, and vessel safety."""
+        from incois_client import get_ocean_state_forecast as _fn
+
+        return await _fn(coastal_district)
+
+    @mcp.tool()
+    async def get_high_wave_alert(coastal_district: str) -> dict:
+        """INCOIS High Wave & Swell Surge warning for coastal fishermen safety."""
+        from incois_client import get_high_wave_alert as _fn
+
+        return await _fn(coastal_district)
+
+    @mcp.tool()
+    async def get_potential_fishing_zone(coastal_district: str) -> dict:
+        """INCOIS Potential Fishing Zone (PFZ): satellite-derived fish shoal coordinates and bearing."""
+        from incois_client import get_potential_fishing_zone as _fn
+
+        return await _fn(coastal_district)
+
 except Exception as e:
     # Graceful fallback for dev without fastmcp installed; keep importable for tests
     mcp = None
