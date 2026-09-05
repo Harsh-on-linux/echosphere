@@ -179,6 +179,20 @@ try:
             lon=lon,
         )
 
+    @mcp.tool()
+    async def get_caller_farm_profile(phone_number: str) -> dict:
+        """Lookup returning farmer/fisherman profile by caller phone number."""
+        from user_store import get_or_create_user as _fn
+
+        return _fn(phone_number)
+
+    @mcp.tool()
+    async def update_crop_record(phone_number: str, crop_name: str, stage: str = "vegetative") -> dict:
+        """Record or update an active crop for a farmer's profile."""
+        from user_store import add_farmer_crop as _fn
+
+        return _fn(phone_number, crop_name=crop_name, growth_stage=stage)
+
 except Exception as e:
     # Graceful fallback for dev without fastmcp installed; keep importable for tests
     mcp = None

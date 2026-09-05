@@ -218,6 +218,7 @@ class Agent:
         persona: Optional[str] = None,
         lat: Optional[float] = None,
         lon: Optional[float] = None,
+        phone_number: Optional[str] = None,
     ) -> Dict[str, Any]:
         """Start agent with the same default vendor chain as the Next.js quickstart."""
         if not channel_name or not str(channel_name).strip():
@@ -254,6 +255,16 @@ class Agent:
                         f"\nUser GPS coordinates: ({lat:.4f}, {lon:.4f}), nearest region: {place}, {nearest['state']}. "
                         f"Assume this location by default unless the user specifies otherwise."
                     )
+            except Exception:
+                pass
+
+        # Phase 5: Caller profile & persistent farm memory handshake
+        if phone_number:
+            try:
+                from user_store import get_profile_context
+                p_ctx = get_profile_context(phone_number)
+                if p_ctx:
+                    instructions += f"\nCaller Profile: {p_ctx}"
             except Exception:
                 pass
 

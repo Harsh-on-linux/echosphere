@@ -241,6 +241,7 @@ class StartAgentRequest(BaseModel):
     persona: Optional[str] = None
     lat: Optional[float] = None
     lon: Optional[float] = None
+    phoneNumber: Optional[str] = None
 
 
 class StopAgentRequest(BaseModel):
@@ -394,6 +395,7 @@ async def start_agent(request: StartAgentRequest):
             persona=request.persona,
             lat=request.lat,
             lon=request.lon,
+            phone_number=request.phoneNumber,
         )
         return {"code": 0, "msg": "success", "data": result}
     except Exception as e:
@@ -615,6 +617,58 @@ async def disaster_broadcast(request: DisasterBroadcastRequest):
         language=request.language or "hi-IN",
     )
     return {"code": 0, "msg": "success", "data": result}
+
+
+# --- User Profile & Caller Memory (Phase 5) ---
+
+class UserProfileRequest(BaseModel):
+    phoneNumber: str
+    name: Optional[str] = None
+    persona: Optional[str] = "farmer"
+    preferredLanguage: Optional[str] = "hi-IN"
+    district: Optional[str] = None
+    tehsil: Optional[str] = None
+
+
+class AddCropRequest(BaseModel):
+    phoneNumber: str
+    cropName: str
+    growthStage: Optional[str] = "vegetative"
+    sowingDate: Optional[str] = None
+
+
+@router.get("/api/userProfile")
+async def get_user_profile(phoneNumber: str = Query(..., description="Phone number")):
+    from user_store import get_or_create_user, get_profile_context
+    user = get_or_create_user(phone_number=phoneNumber)
+    ctx = get_profile_context(phone_number=phoneNumber)
+    return {"code": 0, "msg": "success", "data": {"user": user, "context": ctx}}
+
+
+@router.post("/api/userProfile")
+async def update_user_profile(request: UserProfileRequest):
+    from user_store import get_or_create_user
+    user = get_or_create_user(
+        phone_number=request.phoneNumber,
+        name=request.name,
+        persona=request.persona or "farmer",
+        preferred_language=request.preferredLanguage or "hi-IN",
+        district=request.district,
+        tehsil=request.tehsil,
+    )
+    return {"code": 0, "msg": "success", "data": user}
+
+
+@router.post("/api/userProfile/crop")
+async def add_crop_to_profile(request: AddCropRequest):
+    from user_store import add_farmer_crop
+    user = add_farmer_crop(
+        phone_number=request.phoneNumber,
+        crop_name=request.cropName,
+        growth_stage=request.growthStage or "vegetative",
+        sowing_date=request.sowingDate,
+    )
+    return {"code": 0, "msg": "success", "data": user}
 
 
 app.include_router(router)
