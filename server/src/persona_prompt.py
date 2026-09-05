@@ -42,7 +42,8 @@ GREETINGS = {
 SUPPORTED_LANGUAGES = ("en-IN", "hi-IN", "ta-IN", "mr-IN", "bn-IN")
 INDIC_LANGUAGES = ("hi-IN", "ta-IN", "mr-IN", "bn-IN")
 DEFAULT_LANGUAGE = "en-IN"
-SARVAM_SPEAKER = "anushka"
+SARVAM_SPEAKER = "priya"
+SARVAM_MODEL = "bulbul:v3"
 
 # Shorthand -> BCP-47 map for frontend dropdowns and API params.
 _LANGUAGE_ALIASES = {

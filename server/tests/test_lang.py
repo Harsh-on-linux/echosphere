@@ -67,7 +67,8 @@ def test_hindi_with_key_uses_sarvam(fake_env, monkeypatch):
                                "params": {"api_key": "test-key", "language": "hi-IN"}}
     assert captured["tts"]["vendor"] == "sarvam"
     assert captured["tts"]["params"]["target_language_code"] == "hi-IN"
-    assert captured["tts"]["params"]["speaker"] == "anushka"
+    assert captured["tts"]["params"]["speaker"] == "priya"
+    assert captured["tts"]["params"]["model"] == "bulbul:v3"
     assert captured["config"]["turn_detection"]["language"] == "hi-IN"
     assert captured["config"]["greeting"] == persona_prompt.GREETINGS["hi-IN"]
     # LLM stays managed gpt-4o-mini (BYOK only for speech)
@@ -94,6 +95,7 @@ def test_english_with_sarvam_voice_activates_sarvam(fake_env, monkeypatch):
     monkeypatch.setenv("SARVAM_API_KEY", "test-key")
     agent_mod, captured, result = _start(fake_env, monkeypatch, language="en-IN", voice="anushka")
     assert result["stt"] == "sarvam" and result["tts"] == "sarvam"
-    assert captured["tts"]["params"]["speaker"] == "anushka"
+    assert captured["tts"]["params"]["speaker"] == "priya"
+    assert captured["tts"]["params"]["model"] == "bulbul:v3"
     assert captured["tts"]["params"]["target_language_code"] == "en-IN"
 

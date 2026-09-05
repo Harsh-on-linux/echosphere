@@ -39,7 +39,7 @@ export function QuickstartPipelineMetrics({
 		{ key: "llm", label: "OpenAI LLM", metricTypes: ["llm", "mllm"] },
 		{
 			key: "tts",
-			label: isSarvamTTS ? "Sarvam TTS (Anushka)" : "MiniMax TTS",
+			label: isSarvamTTS ? "Sarvam TTS (Priya)" : "MiniMax TTS",
 			metricTypes: ["tts"],
 		},
 	];

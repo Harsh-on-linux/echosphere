@@ -11,6 +11,7 @@ import time
 from typing import Any, Dict, Optional
 from urllib.parse import urlparse
 
+from pydantic import ConfigDict
 from agora_agent import Area, AsyncAgora
 from agora_agent.agentkit import Agent as AgoraAgent, SalConfig
 from agora_agent.agentkit.token import generate_convo_ai_token
@@ -19,8 +20,44 @@ from agora_agent.agentkit.vendors import (
     MiniMaxTTS,
     OpenAI,
     SarvamSTT,
-    SarvamTTS,
 )
+from agora_agent.agentkit.vendors.tts import BaseTTS
+
+
+class SarvamV3TTS(BaseTTS):
+    """Sarvam AI bulbul:v3 text-to-speech vendor adapter for Agora Conversational AI."""
+    model_config = ConfigDict(extra="allow")
+
+    key: str
+    speaker: str = "priya"
+    target_language_code: str = "hi-IN"
+    model: str = "bulbul:v3"
+    pace: Optional[float] = None
+    pitch: Optional[float] = None
+    loudness: Optional[float] = None
+    sample_rate: Optional[int] = None
+    skip_patterns: Optional[list] = None
+
+    def to_config(self) -> Dict[str, Any]:
+        params: Dict[str, Any] = {
+            "api_subscription_key": self.key,
+            "speaker": self.speaker,
+            "target_language_code": self.target_language_code,
+            "model": self.model,
+        }
+        if self.pace is not None:
+            params["pace"] = self.pace
+        if self.pitch is not None:
+            params["pitch"] = self.pitch
+        if self.loudness is not None:
+            params["loudness"] = self.loudness
+        if self.sample_rate is not None:
+            params["sample_rate"] = self.sample_rate
+
+        result: Dict[str, Any] = {"vendor": "sarvam", "params": params}
+        if self.skip_patterns is not None:
+            result["skip_patterns"] = self.skip_patterns
+        return result
 
 try:
     from persona_prompt import (
@@ -296,10 +333,23 @@ class Agent:
         if use_sarvam:
             stt_language = "unknown" if voice_language == "auto" else voice_language
             tts_language = "en-IN" if voice_language in ("auto", "en", "en-IN") else voice_language
-            speaker = "anushka" if ("anushka" in voice_lower or not voice) else voice
+            speaker = SARVAM_SPEAKER
+            if voice:
+                v_clean = voice.strip().lower()
+                if v_clean in ("anushka", "anushka_v2", "priya"):
+                    speaker = "priya"
+                elif v_clean in ("aditya", "rahul", "ashutosh", "rohan", "amit", "ritu", "neha", "pooja", "simran", "kavya"):
+                    speaker = v_clean
+                else:
+                    speaker = "priya"
             stt = SarvamSTT(api_key=sarvam_key, language=stt_language)
-            tts = SarvamTTS(key=sarvam_key, speaker=speaker,
-                            target_language_code=tts_language, pace=tts_rate)
+            tts = SarvamV3TTS(
+                key=sarvam_key,
+                speaker=speaker,
+                target_language_code=tts_language,
+                model="bulbul:v3",
+                pace=tts_rate,
+            )
             stt_name, tts_name = "sarvam", "sarvam"
         else:
             stt = DeepgramSTT(model="nova-3", language="en")

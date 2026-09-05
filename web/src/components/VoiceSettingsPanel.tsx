@@ -12,7 +12,8 @@ const ASR_LANGUAGES = [
 
 const TTS_VOICES = [
   { value: "English_captivating_female1", label: "MiniMax English female" },
-  { value: "anushka", label: "Sarvam Anushka (Indic, Phase 4)" },
+  { value: "priya", label: "Sarvam Priya (Indic bulbul:v3)" },
+  { value: "aditya", label: "Sarvam Aditya (Indic bulbul:v3)" },
 ] as const;
 
 const PERSONAS = [
@@ -44,9 +45,10 @@ function loadSettings(): VoiceSettings {
     const raw = window.localStorage.getItem(STORAGE_KEY);
     if (raw) {
       const parsed = JSON.parse(raw) as Partial<VoiceSettings>;
+      const storedVoice = parsed.ttsVoice === "anushka" ? "priya" : (parsed.ttsVoice ?? DEFAULT_SETTINGS.ttsVoice);
       return {
         asrLanguage: parsed.asrLanguage ?? DEFAULT_SETTINGS.asrLanguage,
-        ttsVoice: parsed.ttsVoice ?? DEFAULT_SETTINGS.ttsVoice,
+        ttsVoice: storedVoice,
         persona: parsed.persona ?? DEFAULT_SETTINGS.persona,
       };
     }
@@ -96,7 +98,7 @@ export function VoiceSettingsPanel({
             setSettings((prev) => ({
               ...prev,
               asrLanguage: nextLang,
-              ttsVoice: isIndic ? "anushka" : prev.ttsVoice,
+              ttsVoice: isIndic ? "priya" : prev.ttsVoice,
             }));
           }}
           aria-label="ASR language"
