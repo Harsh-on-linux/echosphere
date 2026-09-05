@@ -160,6 +160,25 @@ try:
             growth_stage=growth_stage,
         )
 
+    @mcp.tool()
+    async def trigger_sos_distress(
+        location: str,
+        situation: str,
+        caller_id: str = "VoiceUser",
+        lat: Optional[float] = None,
+        lon: Optional[float] = None,
+    ) -> dict:
+        """Trigger emergency maritime/disaster SOS distress protocol with Coast Guard MRCC routing."""
+        from emergency_handler import dispatch_sos_alert as _fn
+
+        return await _fn(
+            caller_identifier=caller_id,
+            location_text=location,
+            situation_summary=situation,
+            lat=lat,
+            lon=lon,
+        )
+
 except Exception as e:
     # Graceful fallback for dev without fastmcp installed; keep importable for tests
     mcp = None
