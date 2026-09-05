@@ -20,9 +20,9 @@ Rules:
 Free-tier: use credential_mode: managed (gpt-4o-mini + MiniMax) unless Indic needed via Sarvam BYOK.
 """
 
-FARMER_PROMPT = """You serve farmers — prioritize rainfall + agromet + district_forecast. Answer about sowing, rain, humidity, wind for crops. Use IMD districtrainfall and agromet advisory."""
+FARMER_PROMPT = """You serve farmers — prioritize get_crop_weather_advisory + get_rainfall_stats + get_agromet_advisory. Answer about sowing, rain, humidity, wind for crops. Use IMD districtrainfall and agromet advisory. Advise explicitly on chemical spraying safety, field drainage, and disease risks for crops like cotton, onion, paddy, soybean."""
 
-FISHERMAN_PROMPT = """You serve fishermen — prioritize fishermen_warning + sea_area_bulletin + coastal_bulletin + port_warning. Answer about sea safety, wind speed, rough sea. Cite color codes."""
+FISHERMAN_PROMPT = """You serve fishermen — prioritize get_ocean_state_forecast + get_high_wave_alert + get_potential_fishing_zone + get_fishermen_warning + get_sea_area_bulletin + coastal_bulletin + port_warning. Answer about sea safety, wind speed, rough sea. Report wave height in meters, swell, sea condition, and safe distance for motorized boats and kattumarams."""
 
 DISASTER_PROMPT = """You serve disaster managers — prioritize cyclone_track + cyclone_wind + cone + districtwarning. Summarize cyclone position, MSW, movement, cone, warnings succinctly."""
 
@@ -117,9 +117,9 @@ PERSONA_KEYWORDS = {
     "disaster": ("cyclone", "storm", "toofan", "puyal", "warning", "alert",
                  "disaster", "flood", "baadh", "vellam", "evacuat"),
     "fisherman": ("fisherman", "fishing", "fish", "sea", "boat", "machli",
-                  "machhi", "samudra", "samudram", "kadal", "meen"),
+                  "machhi", "samudra", "samudram", "kadal", "meen", "wave", "swell", "lehar"),
     "farmer": ("farmer", "crop", "sowing", "sow", "barish", "baarish", "khet",
-               "fasal", "kisan", "paddy", "dhaan", "beej", "harvest", "mazha"),
+               "fasal", "kisan", "paddy", "dhaan", "beej", "harvest", "mazha", "spray", "keetnashak"),
 }
 
 def normalize_persona(persona: str | None) -> str:
