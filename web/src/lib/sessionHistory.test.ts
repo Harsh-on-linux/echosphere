@@ -71,4 +71,19 @@ describe('sessionHistory', () => {
     clearSnapshots()
     expect(loadSnapshots()).toEqual([])
   })
+
+  test('saveSnapshot and loadSnapshots deduplicate identical entries', () => {
+    withMemoryStorage()
+    const snap = makeSnapshot('dup1')
+    saveSnapshot(snap)
+    saveSnapshot(snap)
+    expect(loadSnapshots()).toHaveLength(1)
+  })
+
+  test('loadSnapshots removes pre-existing duplicates from storage', () => {
+    const { store } = withMemoryStorage()
+    const snap = makeSnapshot('dup2')
+    store.set(SESSION_STORAGE_KEY, JSON.stringify([snap, snap]))
+    expect(loadSnapshots()).toHaveLength(1)
+  })
 })

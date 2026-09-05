@@ -36,19 +36,30 @@ export function loadSnapshots(): SessionSnapshot[] {
     if (!raw) return []
     const parsed: unknown = JSON.parse(raw)
     if (!Array.isArray(parsed)) return []
-    return parsed.filter(
+    const valid = parsed.filter(
       (item): item is SessionSnapshot =>
         !!item &&
         typeof item === 'object' &&
         typeof (item as SessionSnapshot).agentId === 'string',
     )
+    const seen = new Set<string>()
+    return valid.filter((item) => {
+      const key = `${item.agentId}-${item.endedAt}`
+      if (seen.has(key)) return false
+      seen.add(key)
+      return true
+    })
   } catch {
     return []
   }
 }
 
 export function saveSnapshot(snapshot: SessionSnapshot): SessionSnapshot[] {
-  const next = [snapshot, ...loadSnapshots()].slice(0, MAX_SNAPSHOTS)
+  const current = loadSnapshots()
+  const deduped = current.filter(
+    (item) => !(item.agentId === snapshot.agentId && item.endedAt === snapshot.endedAt),
+  )
+  const next = [snapshot, ...deduped].slice(0, MAX_SNAPSHOTS)
   try {
     storage()?.setItem(SESSION_STORAGE_KEY, JSON.stringify(next))
   } catch {

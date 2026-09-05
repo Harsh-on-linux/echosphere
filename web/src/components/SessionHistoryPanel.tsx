@@ -100,9 +100,9 @@ export function SessionHistoryPanel() {
         </div>
       </div>
       <ul className="mt-2 flex max-h-48 flex-col gap-2 overflow-y-auto">
-        {snapshots.map((snap) => (
+        {snapshots.map((snap, index) => (
           <li
-            key={`${snap.agentId}-${snap.endedAt}`}
+            key={`${snap.agentId}-${snap.endedAt}-${index}`}
             className="rounded-lg border border-border/60 px-3 py-2 text-xs text-muted-foreground"
           >
             <div className="flex items-center justify-between gap-2">

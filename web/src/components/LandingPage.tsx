@@ -105,6 +105,7 @@ export default function LandingPage() {
 	const [isLocating, setIsLocating] = useState(false);
 	// Phase 6.2: session start for the persisted history snapshot.
 	const startedAtRef = useRef<number>(0);
+	const isEndingRef = useRef<boolean>(false);
 
 	const handleToggleLocation = () => {
 		if (coords) {
@@ -242,43 +243,49 @@ export default function LandingPage() {
 	);
 
 	const handleEndConversation = async () => {
-		// Phase 6.2: persist history + turns for post-demo analytics (best-effort,
-		// never blocks leave). Snapshot first so a failing stopAgent can't lose it.
-		const snapshotAgentId = agoraData?.agentId;
-		const snapshotChannel = agoraData?.channel ?? "";
-		if (snapshotAgentId) {
-			try {
-				const [history, turns] = await Promise.all([
-					getAgentHistory(snapshotAgentId).catch(() => null),
-					getAgentTurns(snapshotAgentId, { pageSize: 50 }).catch(() => null),
-				]);
-				saveSnapshot({
-					agentId: snapshotAgentId,
-					channel: snapshotChannel,
-					startedAt: startedAtRef.current || Date.now(),
-					endedAt: Date.now(),
-					language: voiceSettings?.asrLanguage,
-					persona: voiceSettings?.persona,
-					history,
-					turns,
-				});
-			} catch {
-				// Persistence must never break conversation teardown.
+		if (isEndingRef.current) return;
+		isEndingRef.current = true;
+		try {
+			// Phase 6.2: persist history + turns for post-demo analytics (best-effort,
+			// never blocks leave). Snapshot first so a failing stopAgent can't lose it.
+			const snapshotAgentId = agoraData?.agentId;
+			const snapshotChannel = agoraData?.channel ?? "";
+			if (snapshotAgentId) {
+				try {
+					const [history, turns] = await Promise.all([
+						getAgentHistory(snapshotAgentId).catch(() => null),
+						getAgentTurns(snapshotAgentId, { pageSize: 50 }).catch(() => null),
+					]);
+					saveSnapshot({
+						agentId: snapshotAgentId,
+						channel: snapshotChannel,
+						startedAt: startedAtRef.current || Date.now(),
+						endedAt: Date.now(),
+						language: voiceSettings?.asrLanguage,
+						persona: voiceSettings?.persona,
+						history,
+						turns,
+					});
+				} catch {
+					// Persistence must never break conversation teardown.
+				}
 			}
-		}
 
-		if (agoraData?.agentId) {
-			try {
-				await stopAgent(agoraData.agentId);
-			} catch (nextError) {
-				console.error("Failed to stop agent:", nextError);
+			if (agoraData?.agentId) {
+				try {
+					await stopAgent(agoraData.agentId);
+				} catch (nextError) {
+					console.error("Failed to stop agent:", nextError);
+				}
 			}
-		}
 
-		rtmClient?.logout().catch((err) => console.error("RTM logout error:", err));
-		setRtmClient(null);
-		setAgoraData(null);
-		setShowConversation(false);
+			rtmClient?.logout().catch((err) => console.error("RTM logout error:", err));
+			setRtmClient(null);
+			setAgoraData(null);
+			setShowConversation(false);
+		} finally {
+			isEndingRef.current = false;
+		}
 	};
 
 	return (
