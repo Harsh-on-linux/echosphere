@@ -24,7 +24,8 @@ const PERSONAS = [
   { value: "disaster", label: "Disaster manager" },
 ] as const;
 
-const STORAGE_KEY = "weathergpt.voice-settings";
+const STORAGE_KEY = "vaayumitra.voice-settings";
+const LEGACY_STORAGE_KEY = "weathergpt.voice-settings";
 
 export type VoiceSettings = {
   asrLanguage: string;
@@ -43,7 +44,7 @@ function loadSettings(): VoiceSettings {
     return { ...DEFAULT_SETTINGS };
   }
   try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
+    const raw = window.localStorage.getItem(STORAGE_KEY) ?? window.localStorage.getItem(LEGACY_STORAGE_KEY);
     if (raw) {
       const parsed = JSON.parse(raw) as Partial<VoiceSettings>;
       const storedVoice = parsed.ttsVoice === "anushka" ? "priya" : (parsed.ttsVoice ?? DEFAULT_SETTINGS.ttsVoice);

@@ -38,7 +38,7 @@ export function SessionHistoryPanel() {
       const url = URL.createObjectURL(blob);
       const anchor = document.createElement("a");
       anchor.href = url;
-      anchor.download = "weathergpt-sessions.json";
+      anchor.download = "vaayumitra-sessions.json";
       anchor.click();
       URL.revokeObjectURL(url);
     } catch {

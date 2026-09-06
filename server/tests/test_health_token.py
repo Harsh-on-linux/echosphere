@@ -8,7 +8,7 @@ def test_health_returns_ok(client):
     assert r.status_code == 200
     data = r.json()
     assert data["status"] == "ok"
-    assert data["service"] == "weathergpt"
+    assert data["service"] == "vaayumitra"
     assert "imd_cache" in data
     assert "agora_configured" in data
 

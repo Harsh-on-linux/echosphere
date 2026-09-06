@@ -1,7 +1,7 @@
-# AGENTS.md — WeatherGPT Build Rules
+# AGENTS.md — VaayuMitra Build Rules
 
 > This file is the source of truth for any AI coding agent (or human) working in this repo.
-> Follow these rules strictly. The project is WeatherGPT + Agora Conversational AI Engine.
+> Follow these rules strictly. The project is VaayuMitra + Agora Conversational AI Engine.
 
 ## 1. Core Constraints
 
@@ -55,7 +55,7 @@ docs(research): update Sarvam pricing Aug 2026
 |-----------|---------------|-------|
 | `Step 0.1` | `chore(phase0): create Agora/Sarvam/IMD accounts and .env.example` | `.env.example`, `research.md` |
 | `Step 0.2` | `chore(tools): install Agora CLI, bun, agora-agents SDK` | `package.json`, `requirements.txt` |
-| `Step 0.3` | `feat(init): scaffold weathergpt via agora init python template` | `frontend/`, `backend/`, `.env` |
+| `Step 0.3` | `feat(init): scaffold vaayumitra via agora init python template` | `frontend/`, `backend/`, `.env` |
 | `Step 1.1` | `chore(structure): define folder layout data/backend/frontend` | `data/imd_districts.json`, `backend/` |
 | `Step 1.2` | `feat(backend): add FastAPI skeleton + imd_client + location_resolver` | `backend/main.py`, `imd_client.py`, `location_resolver.py` |
 | `Step 1.3` | `feat(token): add POST /api/token RTC+RTM generation` | `backend/main.py`, `frontend/api/token.ts` |

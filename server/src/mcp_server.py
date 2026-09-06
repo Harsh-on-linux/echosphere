@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-WeatherGPT MCP Server — Phase 1.2 skeleton + Phase 3.2 full tools
+VaayuMitra MCP Server — Phase 1.2 skeleton + Phase 3.2 full tools
 Exposes IMD tools via FastMCP at /mcp for Agora Conversational AI Engine (llm.mcp_servers).
 
 See research.md #6 (MCP) and plan.md 3.2:

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Phase 6.1 verification: probe a deployed (or local) backend.
-# Usage: BACKEND_URL=https://weathergpt-backend.onrender.com bash scripts/verify-deploy.sh
+# Usage: BACKEND_URL=https://vaayumitra-backend.onrender.com bash scripts/verify-deploy.sh
 # Checks: /health is ok, Agora configured, /mcp served, MCP URL is public HTTPS
 # (required for Agora llm.mcp_servers in prod).
 set -euo pipefail

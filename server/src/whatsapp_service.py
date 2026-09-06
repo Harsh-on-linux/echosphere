@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-WeatherGPT WhatsApp & Disaster Broadcast Service — Phase 4
+VaayuMitra WhatsApp & Disaster Broadcast Service — Phase 4
 Implements Meta WhatsApp Cloud API two-way voice note webhook and
 Automated Outbound Dialing (OBD) for localized disaster Red Alerts.
 """
@@ -8,7 +8,7 @@ import os
 import time
 from typing import Any, Dict, List, Optional
 
-WHATSAPP_VERIFY_TOKEN = os.getenv("WHATSAPP_VERIFY_TOKEN", "weathergpt_verify_token_2026")
+WHATSAPP_VERIFY_TOKEN = os.getenv("WHATSAPP_VERIFY_TOKEN", "vaayumitra_verify_token_2026")
 WHATSAPP_API_TOKEN = os.getenv("WHATSAPP_API_TOKEN", "")
 WHATSAPP_PHONE_NUMBER_ID = os.getenv("WHATSAPP_PHONE_NUMBER_ID", "")
 
@@ -63,7 +63,7 @@ async def process_whatsapp_incoming(payload: Dict[str, Any]) -> Dict[str, Any]:
 
                 elif msg_type == "text":
                     query = msg.get("text", {}).get("body", "")
-                    response_text = f"WeatherGPT report for '{query}': IMD reports clear skies with moderate humidity."
+                    response_text = f"VaayuMitra report for '{query}': IMD reports clear skies with moderate humidity."
                     processed_events.append({
                         "event_id": msg_id,
                         "from": from_num,

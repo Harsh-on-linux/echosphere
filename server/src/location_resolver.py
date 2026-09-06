@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-WeatherGPT Location Resolver — Phase 1.2
+VaayuMitra Location Resolver — Phase 1.2
 Fuzzy district resolver over data/imd_districts.json using rapidfuzz.
 Handles informal names, transliteration (Marathi/Tamil), aliases, and returns nearest 3 if low confidence.
 

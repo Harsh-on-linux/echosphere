@@ -13,7 +13,7 @@ def test_whatsapp_verify_webhook_success(client):
             "/api/whatsapp/webhook",
             params={
                 "hub.mode": "subscribe",
-                "hub.verify_token": "weathergpt_verify_token_2026",
+                "hub.verify_token": "vaayumitra_verify_token_2026",
                 "hub.challenge": "123456789",
             },
         )

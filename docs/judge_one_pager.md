@@ -1,4 +1,4 @@
-# WeatherGPT — Judge One-Pager (plan.md 8.2)
+# VaayuMitra — Judge One-Pager (plan.md 8.2)
 
 Voice-native IMD weather assistant for farmers, fishermen, disaster managers.
 All voice flows through Agora Conversational AI Engine (SD-RTN + RTC/RTM + ASR→LLM→TTS).
@@ -7,11 +7,11 @@ Every weather fact carries IMD source + timestamp. 3-min live script: `docs/demo
 ## Try it
 
 - Local: `bun run setup`, `bun run dev` → http://localhost:3000 → Start conversation.
-- Prod target: backend `https://weathergpt-backend.onrender.com` (`render.yaml:24`),
+- Prod target: backend `https://vaayumitra-backend.onrender.com` (`render.yaml:24`),
   frontend on Vercel per `README.md:74`. Verify:
-  `BACKEND_URL=https://weathergpt-backend.onrender.com bash scripts/verify-deploy.sh`.
+  `BACKEND_URL=https://vaayumitra-backend.onrender.com bash scripts/verify-deploy.sh`.
 - QR to live frontend: TODO — generate after Vercel deploy, print for the table.
-  (Planned URL per `plan.md:336`: `weathergpt.vercel.app`; confirm before printing.)
+  (Planned URL per `plan.md:336`: `vaayumitra.vercel.app`; confirm before printing.)
 
 ## Architecture (SD-RTN central)
 
@@ -47,7 +47,7 @@ Guards: `idle_timeout` 120s, no card on file (suspends at 300 instead of chargin
 
 ## Impact
 
-- IMD portal today: ~7 clicks, English text, needs literacy + data. WeatherGPT: ~7 sec voice, no literacy needed.
+- IMD portal today: ~7 clicks, English text, needs literacy + data. VaayuMitra: ~7 sec voice, no literacy needed.
 - Telephony-first: feature-phone farmer dials in (Beta via Console → Talk to Us); today the
   phone-bridge fallback (mobile on speaker by laptop mic) demos the same loop at ~0 cost.
 - Population-scale impact numbers: TODO — fill with sourced figures before printing.

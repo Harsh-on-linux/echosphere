@@ -1,4 +1,4 @@
-# WeatherGPT — Step-by-Step Implementation Plan
+# VaayuMitra — Step-by-Step Implementation Plan
 > Voice-native IMD assistant | Agora Conversational AI Engine as CENTRAL layer | Free-tier first
 > Stack: Agora RTC+RTM+Conv AI Engine + FastMCP + IMD APIs + Sarvam (Indic) | Templates: Python or Next.js
 
@@ -48,8 +48,8 @@ Decision:
 
 Command:
 ```bash
-agora init weathergpt --template python   # or nextjs
-cd weathergpt
+agora init vaayumitra --template python   # or nextjs
+cd vaayumitra
 bun run setup
 bun run dev   # should open http://localhost:3000 with Start conversation button
 ```
@@ -64,7 +64,7 @@ bun run dev   # should open http://localhost:3000 with Start conversation button
 
 ### Step 1.1 — Define Folder Layout
 ```
-weathergpt/
+vaayumitra/
 ├── frontend/                # from starter (Next.js or Vite)
 │   ├── src/ components/ VoiceClient.tsx, MapPanel.tsx, Transcript.tsx
 │   └── pages/api/token.ts, start-agent.ts, stop-agent.ts
@@ -113,7 +113,7 @@ from agora_agent import Agent, Agora, Area
 from agora_agent.agentkit import DeepgramSTT, OpenAI, MiniMaxTTS
 
 client = Agora(area=Area.US, app_id=APP_ID, app_certificate=APP_CERT)
-agent = Agent(client, turn_detection={"language":"en-US"}).with_stt(DeepgramSTT(model="nova-3", language="en")).with_llm(OpenAI(model="gpt-4o-mini", system_messages=[...], greeting_message="Hello, I am WeatherGPT. Which district?", max_history=10)).with_tts(MiniMaxTTS(model="speech-2.6-turbo", voice_id="English_captivating_female1"))
+agent = Agent(client, turn_detection={"language":"en-US"}).with_stt(DeepgramSTT(model="nova-3", language="en")).with_llm(OpenAI(model="gpt-4o-mini", system_messages=[...], greeting_message="Hello, I am VaayuMitra. Which district?", max_history=10)).with_tts(MiniMaxTTS(model="speech-2.6-turbo", voice_id="English_captivating_female1"))
 session = agent.create_session(channel=channel, agent_uid="0", remote_uids=["*"], name=f"wx-{int(time.time())}", idle_timeout=120)
 agent_id = session.start()
 ```
@@ -187,14 +187,14 @@ Update `Agent` creation to:
 ```python
 .with_llm(OpenAI(
   model="gpt-4o-mini",
-  system_messages=[WEATHERGPT_SYSTEM],
+  system_messages=[VAAYUMITRA_SYSTEM],
   mcp_servers=[{"url": f"{BACKEND_URL}/mcp", "name": "imd"}]
 ))
 # + advanced_features.enable_tools=true
 ```
 System prompt must enforce:
 ```
-You are WeatherGPT, IMD-grounded. Steps: 1) Detect persona (farmer asks rain/sowing, fisherman asks sea, officer asks cyclone). 2) Call resolve_location. 3) Call ONE IMD tool relevant to persona. 4) Summarize in user's language, <30 words, plain, with source. 5) Never hallucinate numbers.
+You are VaayuMitra, IMD-grounded. Steps: 1) Detect persona (farmer asks rain/sowing, fisherman asks sea, officer asks cyclone). 2) Call resolve_location. 3) Call ONE IMD tool relevant to persona. 4) Summarize in user's language, <30 words, plain, with source. 5) Never hallucinate numbers.
 ```
 
 **Verification:** Say "Is it safe to go fishing from Nagapattinam tomorrow?" -> RTM history shows `resolve_location("Nagapattinam") -> get_fishermen_warning` -> spoken answer references IMD warning.
@@ -235,7 +235,7 @@ Add `TTS pace`: slower (0.9) for elders, `pitch` tweak per persona.
 
 ### Step 4.3 — Greeting & Filler Polish
 ```json
-"llm": {"greeting_message": "Namaste, main WeatherGPT hun...", "greeting_configs": {"mode":"single_first", "interruptable": true, "delay_ms": 200}},
+"llm": {"greeting_message": "Namaste, main VaayuMitra hun...", "greeting_configs": {"mode":"single_first", "interruptable": true, "delay_ms": 200}},
 "filler_words": {"enable": true, "words": ["Ek second, IMD check kar raha hun..."]}
 ```
 If deploying telugu/tamil greeting audio pre-recorded, use `greeting_audio_url` (v2.9).
@@ -323,17 +323,17 @@ Prove: Record video showing agent speaking, judge says "Ruko!" -> audio cuts wit
 ## Phase 8 — Demo Script & Judging Optimization (Day 3-4, 2 hours)
 
 ### Step 8.1 — Build Demo Narrative (3 min live)
-0:00 Greeting in Hindi: "WeatherGPT, Pune ka mausam?"
+0:00 Greeting in Hindi: "VaayuMitra, Pune ka mausam?"
 0:20 Agent answers with IMD source.
 0:40 Switch persona live: "Now act as fisherman, same place — can I fish?" -> shows tool routing diff.
 1:10 Interrupt mid-answer: proves intelligent interruption.
 1:30 Language switch: "Tell me in Tamil" -> agent switches voice mid-session.
 2:00 Noisy demo: play boat sound, show correct result vs without SAL.
-2:30 Impact slide: "IMD portal: 7 clicks, needs English. WeatherGPT: 7 sec voice, no literacy."
+2:30 Impact slide: "IMD portal: 7 clicks, needs English. VaayuMitra: 7 sec voice, no literacy."
 
 ### Step 8.2 — Materials for Judges
 - One-pager with architecture diagram (SD-RTN central), free tier proof (cost sheet), impact numbers (farmers/fishermen population).
-- QR -> live `weathergpt.vercel.app` for judges to try.
+- QR -> live `vaayumitra.vercel.app` for judges to try.
 - Backup video recording in case network fails.
 
 ### Step 8.3 — Final Checks

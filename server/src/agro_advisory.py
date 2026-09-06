@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-WeatherGPT Agro-Advisory Engine — Phase 2.2
+VaayuMitra Agro-Advisory Engine — Phase 2.2
 Translates raw meteorological variables (rainfall, humidity, wind, temperature)
 into actionable agronomic guidance based on ICAR / Krishi Vigyan Kendra (KVK) guidelines.
 

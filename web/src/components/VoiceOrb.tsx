@@ -17,7 +17,7 @@ export function VoiceOrb({ state, children }: VoiceOrbProps) {
   return (
     <section
       className="relative flex h-full min-h-[20rem] w-full max-w-4xl flex-col items-center justify-center gap-2"
-      aria-label="WeatherGPT voice status"
+      aria-label="VaayuMitra voice status"
     >
       <AgentVisualizer state={state} size="lg" />
       <p className="text-xs text-muted-foreground" aria-live="polite">
@@ -27,7 +27,7 @@ export function VoiceOrb({ state, children }: VoiceOrbProps) {
             ? "Checking IMD…"
             : state === "talking"
               ? "Speaking…"
-              : "WeatherGPT"}
+              : "VaayuMitra"}
       </p>
       {children}
     </section>

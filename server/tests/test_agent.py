@@ -66,8 +66,8 @@ def test_start_wires_managed_openai_and_returns_shape(fake_env, monkeypatch):
     assert captured["remote_uids"] == ["222"]
 
 
-def test_start_wires_weathergpt_voice_loop(fake_env, monkeypatch):
-    """Phase 2.1: WeatherGPT prompt, greeting, idle_timeout 120, interruption."""
+def test_start_wires_vaayumitra_voice_loop(fake_env, monkeypatch):
+    """Phase 2.1: VaayuMitra prompt, greeting, idle_timeout 120, interruption."""
     agent = _fresh_agent_module()
     captured = {}
 
@@ -95,8 +95,8 @@ def test_start_wires_weathergpt_voice_loop(fake_env, monkeypatch):
 
     assert result["agent_id"] == "test-agent-id"
     config = captured["config"]
-    # WeatherGPT identity (not the Ada quickstart default)
-    assert "WeatherGPT" in (config["instructions"] or "")
+    # VaayuMitra identity (not the Ada quickstart default)
+    assert "VaayuMitra" in (config["instructions"] or "")
     assert "IMD" in (config["instructions"] or "")
     assert config["greeting"] == agent.WEATHERGPT_GREETING
     assert "IMD" in (config["failure_message"] or "")

@@ -94,7 +94,7 @@ except ImportError:  # pragma: no cover - fallback when run from a different cwd
 
 logger = logging.getLogger("uvicorn.error")
 
-# Phase 2.1 — WeatherGPT managed voice loop (plan.md 2.1, research.md #5).
+# Phase 2.1 — VaayuMitra managed voice loop (plan.md 2.1, research.md #5).
 # Agora is central: ASR->LLM->TTS runs in the Conversational AI Engine.
 # Free-tier first: managed Deepgram + gpt-4o-mini + MiniMax (no BYOK keys).
 WEATHERGPT_GREETING = GREETINGS["en-IN"]
@@ -102,6 +102,9 @@ WEATHERGPT_FAILURE = (
     "IMD data is busy right now. Last update was a few minutes ago. "
     "Please try again in a moment."
 )
+# Canonical rebrand aliases.
+VAAYUMITRA_GREETING = WEATHERGPT_GREETING
+VAAYUMITRA_FAILURE = WEATHERGPT_FAILURE
 WEATHERGPT_MAX_HISTORY = 10
 # Free-tier guard: auto-leave after 2 min silence (plan.md 2.1/2.3, AGENTS.md #5).
 WEATHERGPT_IDLE_TIMEOUT = 120
@@ -561,12 +564,12 @@ class Agent:
         language: Optional[str] = None,
         persona: Optional[str] = None,
     ) -> Dict[str, Any]:
-        """Outbound PSTN call that joins the callee to a WeatherGPT voice agent.
+        """Outbound PSTN call that joins the callee to a VaayuMitra voice agent.
 
         Requires the Telephony Beta (TELEPHONY_ENABLED + FROM_NUMBER +
         CUSTOMER_ID/SECRET); otherwise raises TelephonyDisabledError (501)
         with setup steps. Uses the SDK telephony.call SIP path with minimal
-        channel properties — after the Beta grant, embed the full WeatherGPT
+        channel properties — after the Beta grant, embed the full VaayuMitra
         STT/LLM/TTS pipeline config here so phone callers get the same
         Hinglish/Indic voice loop as web callers.
         """

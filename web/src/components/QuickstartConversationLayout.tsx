@@ -1,9 +1,30 @@
 "use client";
 
-import Image from "next/image";
 import type { ReactNode } from "react";
 
 import { Button } from "@/components/ui/button";
+
+export function VaayuMitraMark({ size = 40 }: { size?: number }) {
+	return (
+		<span
+			aria-hidden
+			className="relative grid shrink-0 place-items-center rounded-2xl"
+			style={{
+				width: size,
+				height: size,
+				background:
+					"linear-gradient(135deg, hsl(172 66% 50% / 0.25), hsl(38 92% 60% / 0.18)), hsl(var(--surface-elevated))",
+				border: "1px solid hsl(var(--border))",
+			}}
+		>
+			<svg width={size * 0.6} height={size * 0.6} viewBox="0 0 100 100" fill="none">
+				<path d="M18 40h36a13 13 0 1 0-13-13" stroke="hsl(172 66% 55%)" strokeWidth="9" strokeLinecap="round" />
+				<path d="M18 60h52a13 13 0 1 1-13 13" stroke="hsl(38 92% 62%)" strokeWidth="9" strokeLinecap="round" />
+				<circle cx="74" cy="30" r="7" fill="hsl(38 92% 62%)" />
+			</svg>
+		</span>
+	);
+}
 
 type QuickstartConversationLayoutProps = {
 	statusPanel: ReactNode;
@@ -34,19 +55,13 @@ export function QuickstartConversationLayout({
 		<div className="flex min-h-0 flex-1 flex-col text-left">
 			<header className="flex shrink-0 flex-col gap-4 border-b border-border px-4 py-4 md:h-[76px] md:flex-row md:items-center md:justify-between md:px-6 md:py-0">
 				<div className="flex min-w-0 items-center gap-3">
-					<Image
-						src="/agora-logo-mark.svg"
-						alt="Agora"
-						width={40}
-						height={40}
-						className="h-10 w-10 shrink-0 object-contain"
-					/>
+					<VaayuMitraMark />
 					<div className="flex min-w-0 flex-col justify-center gap-1">
 						<span className="truncate text-lg font-semibold leading-none tracking-[-0.025em] text-foreground">
-							WeatherGPT
+							VaayuMitra
 						</span>
 						<span className="truncate text-xs text-muted-foreground">
-							IMD-grounded voice assistant · Agora Conversational AI
+							IMD-grounded voice intelligence · Agora Conversational AI
 						</span>
 						{pipelineMetrics}
 					</div>

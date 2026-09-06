@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-WeatherGPT IMD Client — Phase 1.2 + 3.1
+VaayuMitra IMD Client — Phase 1.2 + 3.1
 Wraps 10 IMD endpoint groups with 5-minute TTL cache and mock fallback.
 
 Research: research.md #11 for full endpoint list.

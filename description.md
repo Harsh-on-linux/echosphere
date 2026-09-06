@@ -1,8 +1,8 @@
-﻿# WeatherGPT — Comprehensive System Architecture, Implementation & Workflow Specification
+﻿# VaayuMitra — Comprehensive System Architecture, Implementation & Workflow Specification
 
 ## 1. Executive Summary & Problem Statement
 
-**WeatherGPT** is a voice-native, multilingual meteorological assistant built for rural and coastal communities across India. It bridges the critical last-mile gap between official scientific weather data—published by the **India Meteorological Department (IMD)** and the **Indian National Centre for Ocean Information Services (INCOIS)**—and ground-level citizens (farmers, fishermen, and disaster management teams).
+**VaayuMitra** is a voice-native, multilingual meteorological assistant built for rural and coastal communities across India. It bridges the critical last-mile gap between official scientific weather data—published by the **India Meteorological Department (IMD)** and the **Indian National Centre for Ocean Information Services (INCOIS)**—and ground-level citizens (farmers, fishermen, and disaster management teams).
 
 ### The Problem
 - **Literacy & Digital Divide:** Traditional weather bulletins, PDFs, and mobile apps demand high literacy, smartphone proficiency, and stable data connectivity.
@@ -10,8 +10,8 @@
 - **Actionable Ground Context:** Raw meteorological metrics (e.g., "35 mm rainfall, 85% RH") lack practical meaning for a farmer wondering whether to spray pesticide or harvest crops, or a fisherman deciding whether to venture 15 nautical miles out to sea.
 - **Latency & Life Safety:** During cyclonic storms, extreme rainfall, or storm surges, delayed or ungrounded weather advisories directly cause loss of life and livelihood.
 
-### The WeatherGPT Solution
-WeatherGPT provides an **interruption-capable, natural voice conversation** over web browsers and standard phone lines (PSTN via Telephony). The system:
+### The VaayuMitra Solution
+VaayuMitra provides an **interruption-capable, natural voice conversation** over web browsers and standard phone lines (PSTN via Telephony). The system:
 1. Resolves colloquial district and village names dynamically across Indian dialects.
 2. Calls real-time IMD & INCOIS endpoints via a **FastMCP (Model Context Protocol)** tool layer.
 3. Translates technical forecasts into persona-tailored, actionable advice (crop-stage specific agromet advisories, wave-height and port warnings, evacuation routes).
@@ -47,7 +47,7 @@ The following diagram illustrates the end-to-end data flow and ownership boundar
                                            | POST /mcp
                                            v
 +-----------------------------------------------------------------------------------+
-|                           WEATHERGPT BACKEND (FastAPI)                             |
+|                           VAAYUMITRA BACKEND (FastAPI)                             |
 |                                                                                   |
 |  +-----------------------------------------------------------------------------+  |
 |  | FastMCP Tool Server (/mcp)                                                  |  |
@@ -105,7 +105,7 @@ The following diagram illustrates the end-to-end data flow and ownership boundar
 
 ## 4. End-to-End Workflow & Lifecycle
 
-The lifecycle of a WeatherGPT interaction consists of five synchronized phases:
+The lifecycle of a VaayuMitra interaction consists of five synchronized phases:
 
 ### Phase 1: Connection & Authentication (Token007)
 1. The user clicks **"Start conversation"** or triggers an incoming phone call.
@@ -184,7 +184,7 @@ Mounted directly at FastAPI route `/mcp` using stateless streamable HTTP JSON-RP
   - Conversational style: Urgent, clear, directive, avoiding ambiguous language.
 
 ### 5.4 Multilingual Voice Matrix
-WeatherGPT supports both global managed voice pipelines and native Indic voice models:
+VaayuMitra supports both global managed voice pipelines and native Indic voice models:
 - **English (Global):** Deepgram Nova-2 STT -> GPT-4o-mini -> MiniMax `speech-2.6-turbo`.
 - **Hindi (`hi-IN`):** Sarvam Saarika v2 STT -> GPT-4o-mini -> Sarvam Bulbul v3 (`anushka` or `aditya`).
 - **Bhojpuri (`bho-IN`):** Specialized Devanagari phonetic prompt tuning via Sarvam Saarika + Bulbul.

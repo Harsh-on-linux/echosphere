@@ -3,6 +3,7 @@
 import { Loader2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { VaayuMitraMark } from "@/components/QuickstartConversationLayout";
 
 type QuickstartPreCallCardProps = {
 	isLoading: boolean;
@@ -23,19 +24,35 @@ export function QuickstartPreCallCard({
 }: QuickstartPreCallCardProps) {
 	return (
 		<div
-			className="mx-auto flex w-[min(92vw,26.25rem)] animate-fade-up flex-col items-center rounded-[20px] border border-[#2b2b2b] px-10 py-10 text-center shadow-[0_10px_24px_rgba(0,0,0,0.28)]"
+			className="relative mx-auto flex w-[min(94vw,30rem)] animate-fade-up flex-col items-center overflow-hidden rounded-3xl border border-border px-8 py-9 text-center shadow-[0_24px_70px_rgba(0,0,0,0.5)]"
 			style={{
-				backgroundImage:
-					"linear-gradient(164.988deg, rgba(54,54,54,0.2) 1.0596%, rgba(0,0,0,0) 96.089%), linear-gradient(90deg, rgb(16,16,16) 0%, rgb(16,16,16) 100%)",
+				background:
+					"linear-gradient(165deg, hsl(172 66% 50% / 0.12), transparent 42%), linear-gradient(210deg, hsl(38 92% 60% / 0.1), transparent 46%), linear-gradient(180deg, hsl(var(--surface-elevated)), hsl(var(--surface)))",
 			}}
 		>
-			<h1 className="text-[28px] font-medium leading-[1.2] text-white">
-				Talk to WeatherGPT
-			</h1>
-			<p className="mt-[14px] text-sm font-medium leading-6 text-muted-foreground">
-				IMD-grounded voice weather for farmers, fishermen, and disaster
-				managers — powered by Agora&apos;s Conversational AI engine.
+			<div className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-primary/20 blur-3xl" />
+			<div className="pointer-events-none absolute -bottom-12 -left-10 h-40 w-40 rounded-full bg-accent/15 blur-3xl" />
+			<div className="relative">
+				<VaayuMitraMark size={56} />
+				<span className="vm-pulse-ring absolute inset-0 rounded-2xl border border-primary/50" aria-hidden />
+			</div>
+			<p className="mt-4 text-[11px] font-semibold uppercase tracking-[0.22em] text-primary">
+				वायुमित्र · IMD-grounded
 			</p>
+			<h1 className="mt-1 text-3xl font-semibold leading-tight tracking-tight text-foreground">
+				Talk to VaayuMitra
+			</h1>
+			<p className="mt-3 text-sm font-medium leading-6 text-muted-foreground">
+				Bharat&apos;s voice-native मौसम intelligence — district forecasts,
+				sea-state and cyclone alerts for farmers, fishermen, and disaster
+				teams. No typing, no English needed.
+			</p>
+			<div className="mt-4 flex flex-wrap items-center justify-center gap-2 text-[11px] font-medium">
+				<span className="rounded-full border border-border bg-secondary/70 px-2.5 py-1 text-secondary-foreground">🌾 Farmer</span>
+				<span className="rounded-full border border-border bg-secondary/70 px-2.5 py-1 text-secondary-foreground">🎣 Fisherman</span>
+				<span className="rounded-full border border-border bg-secondary/70 px-2.5 py-1 text-secondary-foreground">🚨 Disaster</span>
+				<span className="rounded-full border border-primary/40 bg-primary/10 px-2.5 py-1 text-primary">✓ IMD cited</span>
+			</div>
 
 			{onToggleLocation ? (
 				<button
@@ -67,7 +84,7 @@ export function QuickstartPreCallCard({
 			<Button
 				onClick={onStartConversation}
 				disabled={isLoading}
-				className="mt-8 h-10 w-full rounded-lg border border-primary bg-primary text-sm font-medium text-black hover:border-white hover:bg-white hover:text-black disabled:hover:border-primary disabled:hover:bg-primary disabled:hover:text-black"
+				className="relative z-10 mt-7 h-11 w-full rounded-xl bg-primary text-sm font-semibold text-primary-foreground shadow-[0_10px_30px_hsl(172_66%_50%/0.3)] hover:brightness-110 disabled:opacity-70"
 				aria-label={
 					isLoading
 						? "Starting conversation with AI agent"

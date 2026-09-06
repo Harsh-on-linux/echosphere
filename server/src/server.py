@@ -24,7 +24,7 @@ from pydantic import BaseModel
 from agora_agent.agentkit.token import generate_convo_ai_token
 from agent import Agent
 
-# WeatherGPT additions (Phase 1.2)
+# VaayuMitra additions (Phase 1.2)
 try:
     import imd_client  # noqa: F401
     import location_resolver  # noqa: F401
@@ -278,7 +278,7 @@ class HangupRequest(BaseModel):
 
 @router.get("/health")
 async def health():
-    """Health check for WeatherGPT + Agora readiness"""
+    """Health check for VaayuMitra + Agora readiness"""
     info = {}
     if imd_client is not None:
         try:
@@ -287,7 +287,7 @@ async def health():
             info = {"cache": "unknown"}
     return {
         "status": "ok",
-        "service": "weathergpt",
+        "service": "vaayumitra",
         "version": "1.2.0",
         "agora_configured": agent is not None,
         "imd_cache": info,
@@ -528,7 +528,7 @@ async def telephony_status():
 
 @router.post("/dial")
 async def dial(request: DialRequest):
-    """Outbound PSTN call joining the callee to a WeatherGPT agent (plan.md 6.3)"""
+    """Outbound PSTN call joining the callee to a VaayuMitra agent (plan.md 6.3)"""
     if agent is None:
         raise HTTPException(
             status_code=500,

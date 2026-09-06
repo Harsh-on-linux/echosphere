@@ -1,4 +1,4 @@
-# WeatherGPT — Manual Demo & Regression Script (plan.md 7.3 / 8.1)
+# VaayuMitra — Manual Demo & Regression Script (plan.md 7.3 / 8.1)
 
 Live-voice half of the test matrix. Automated half: `pytest server/tests`
 (146+ tests, mock IMD, no cloud). Budget: this script burns ~5 Conv AI mins.

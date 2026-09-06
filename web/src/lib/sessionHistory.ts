@@ -16,7 +16,8 @@ export type SessionSnapshot = {
   turns: unknown
 }
 
-export const SESSION_STORAGE_KEY = 'weathergpt.sessions.v1'
+export const SESSION_STORAGE_KEY = 'vaayumitra.sessions.v1'
+const LEGACY_STORAGE_KEY = 'weathergpt.sessions.v1'
 export const MAX_SNAPSHOTS = 20
 
 function storage(): Storage | null {
@@ -32,7 +33,7 @@ export function loadSnapshots(): SessionSnapshot[] {
   const store = storage()
   if (!store) return []
   try {
-    const raw = store.getItem(SESSION_STORAGE_KEY)
+    const raw = store.getItem(SESSION_STORAGE_KEY) ?? store.getItem(LEGACY_STORAGE_KEY)
     if (!raw) return []
     const parsed: unknown = JSON.parse(raw)
     if (!Array.isArray(parsed)) return []

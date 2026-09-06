@@ -1,10 +1,10 @@
-# WeatherGPT — Voice-Native IMD Assistant
+# VaayuMitra — Bharat's Voice-Native मौसम Intelligence
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 [![Python](https://img.shields.io/badge/python-%3E%3D3.10-blue)](https://www.python.org/)
 [![Bun](https://img.shields.io/badge/bun-latest-black)](https://bun.sh/)
 
-Voice-native IMD (India Meteorological Department) weather assistant powered by the Agora Conversational AI Engine, Next.js web client, and Python FastAPI backend. Features specialized personas (farmer, fisherman, disaster relief), real-time weather alerts, Cyclone eAtlas maps, and regional language support (Hindi, Bhojpuri, Marathi, and more).
+IMD-grounded voice intelligence for farmers, fishermen, and disaster teams — district forecasts, sea-state and cyclone alerts in your language, no typing or English needed. Powered by the Agora Conversational AI Engine, Next.js web client, and Python FastAPI backend with a FastMCP tool layer. Features specialized personas (farmer, fisherman, disaster relief), real-time weather alerts, Cyclone eAtlas maps, and regional language support (Hindi, Bhojpuri, Marathi, and more).
 
 ## Prerequisites
 

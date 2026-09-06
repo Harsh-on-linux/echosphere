@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-WeatherGPT Open-Meteo Client — Secondary Meteorological Fallback
+VaayuMitra Open-Meteo Client — Secondary Meteorological Fallback
 Provides live weather forecasting via Open-Meteo (ECMWF / GFS) when IMD gateway
 experiences downtime, rate limits, or IP whitelisting delays.
 

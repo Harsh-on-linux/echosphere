@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 """
-WeatherGPT Persona Prompts — Phase 1.2 + 4.2
+VaayuMitra Persona Prompts — Phase 1.2 + 4.2
 System prompts per persona: farmer / fisherman / disaster manager
 See plan.md 4.2 for routing logic and research.md #6 for grounding rules.
 """
 
-WEATHERGPT_SYSTEM = """You are WeatherGPT, IMD-grounded voice assistant for farmers, fishermen, disaster managers.
+VAAYUMITRA_SYSTEM = """You are VaayuMitra, IMD-grounded voice assistant for farmers, fishermen, disaster managers.
 You run via Agora Conversational AI Engine (SD-RTN + RTC/RTM + ASR->LLM->TTS) — never call LLM directly.
 
 Rules:
@@ -28,12 +28,12 @@ DISASTER_PROMPT = """You serve disaster managers — prioritize cyclone_track + 
 
 # For Agent init — greeting per language
 GREETINGS = {
-    "en-IN": "Hello, I am WeatherGPT. Which district's weather do you need?",
-    "hi-IN": "Namaste, main WeatherGPT hun. Kaun se jile ka mausam janna hai?",
-    "bho-IN": "Pranam, hum WeatherGPT haeen. Rauwa kavan jila ke mausam jaane ke chahat baani?",
-    "ta-IN": "Vanakkam, naan WeatherGPT. Endha mavattam vaanilai vendum?",
-    "mr-IN": "Namaskar, mi WeatherGPT ahe. Konatya jilhyacha hawaman havay?",
-    "bn-IN": "Namaskar, ami WeatherGPT. Kon jelar abhawa jante chan?",
+    "en-IN": "Hello, I am VaayuMitra. Which district's weather do you need?",
+    "hi-IN": "Namaste, main VaayuMitra hun. Kaun se jile ka mausam janna hai?",
+    "bho-IN": "Pranam, hum VaayuMitra haeen. Rauwa kavan jila ke mausam jaane ke chahat baani?",
+    "ta-IN": "Vanakkam, naan VaayuMitra. Endha mavattam vaanilai vendum?",
+    "mr-IN": "Namaskar, mi VaayuMitra ahe. Konatya jilhyacha hawaman havay?",
+    "bn-IN": "Namaskar, ami VaayuMitra. Kon jelar abhawa jante chan?",
 }
 
 # Phase 4.1 — Indic pipeline languages (plan.md 4.1, research.md #12).
@@ -101,7 +101,7 @@ FILLER_PHRASES = [
 FILLER_WORDS = {"enable": True, "content": {"static_config": {"phrases": FILLER_PHRASES}}}
 
 def get_system_prompt(persona: str = "general") -> str:
-    base = WEATHERGPT_SYSTEM
+    base = VAAYUMITRA_SYSTEM
     if persona == "farmer":
         return base + "\n\nPersona hint: " + FARMER_PROMPT
     if persona == "fisherman":
@@ -110,9 +110,12 @@ def get_system_prompt(persona: str = "general") -> str:
         return base + "\n\nPersona hint: " + DISASTER_PROMPT
     return base
 
+# Back-compat alias (pre-rebrand imports).
+WEATHERGPT_SYSTEM = VAAYUMITRA_SYSTEM
+
 # Phase 4.2 — persona-aware routing (plan.md 4.2).
 # Pre-call persona picks the system-prompt hint + TTS rate; in-session the
-# LLM re-detects per utterance (WEATHERGPT_SYSTEM rule 1). Farmer speech is
+# LLM re-detects per utterance (VAAYUMITRA_SYSTEM rule 1). Farmer speech is
 # slowed to 0.9 for elders; disaster is slightly brisk (1.05).
 PERSONAS = ("general", "farmer", "fisherman", "disaster")
 DEFAULT_PERSONA = "general"
@@ -137,7 +140,7 @@ def normalize_persona(persona: str | None) -> str:
 def detect_persona(text: str | None) -> str:
     """Keyword persona detection (priority: disaster > fisherman > farmer).
 
-    Mirrors WEATHERGPT_SYSTEM rule 1 so tests and the voice prompt agree.
+    Mirrors VAAYUMITRA_SYSTEM rule 1 so tests and the voice prompt agree.
     """
     if not text:
         return DEFAULT_PERSONA

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-WeatherGPT Regional Audio Bulletin & Broadcast Pre-Synthesis Cache — Phase 6
+VaayuMitra Regional Audio Bulletin & Broadcast Pre-Synthesis Cache — Phase 6
 Generates and caches standardized 30-second localized weather bulletins
 for Indian districts in top regional languages (hi, mr, ta, te, bn, en),
 slashing recurring LLM & TTS compute costs by over 80%.
@@ -137,7 +137,7 @@ def get_or_create_cached_bulletin(
     )
     # Simulated pre-rendered audio asset URL or Sarvam audio hash
     audio_slug = hashlib.sha256(script.encode("utf-8")).hexdigest()[:16]
-    audio_url = f"https://cdn.weathergpt.in/bulletins/{language}/{district_name.lower()}-{audio_slug}.opus"
+    audio_url = f"https://cdn.vaayumitra.in/bulletins/{language}/{district_name.lower()}-{audio_slug}.opus"
 
     entry = {
         "cache_key": cache_key,
@@ -151,7 +151,7 @@ def get_or_create_cached_bulletin(
         "generated_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(now)),
         "expires_at": now + ttl_seconds,
         "cache_hit": False,
-        "source": "WeatherGPT Pre-Synthesis Engine (Open-Meteo + ICAR-KVK)",
+        "source": "VaayuMitra Pre-Synthesis Engine (Open-Meteo + ICAR-KVK)",
     }
     _BULLETIN_CACHE[cache_key] = entry
     return entry

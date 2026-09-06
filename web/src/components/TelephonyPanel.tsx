@@ -12,7 +12,7 @@ import {
 /**
  * TelephonyPanel — plan.md Step 6.3 phone-first access.
  * When the Agora Telephony Beta is granted, dial any E.164 number and the
- * callee joins the same WeatherGPT voice loop. Until then the panel shows
+ * callee joins the same VaayuMitra voice loop. Until then the panel shows
  * the enable steps plus the zero-cost phone-bridge fallback (mobile on
  * speaker by the laptop mic), which demos identically for judges.
  */

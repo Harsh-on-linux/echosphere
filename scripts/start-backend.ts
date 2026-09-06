@@ -19,7 +19,7 @@ function getPythonExecutable(): string {
 }
 
 const pythonExe = getPythonExecutable()
-console.log(`[WeatherGPT Backend] Using Python: ${pythonExe}`)
+console.log(`[VaayuMitra Backend] Using Python: ${pythonExe}`)
 
 const proc = spawn(pythonExe, ['src/server.py'], {
   cwd: serverDir,

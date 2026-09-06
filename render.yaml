@@ -1,15 +1,15 @@
-# WeatherGPT — Render Blueprint (plan.md Step 6.1)
+# VaayuMitra — Render Blueprint (plan.md Step 6.1)
 # Apply: connect this repo in Render Dashboard -> New -> Blueprint -> select render.yaml,
 # or `render blueprint launch` with the Render CLI. Then set the sync:false secrets below
 # in the dashboard (never commit them — AGENTS.md #3.6).
 #
 # After the first deploy, update BACKEND_URL to the live
-# https://weathergpt-backend.onrender.com URL (and MCP_SERVER_URL if explicit),
+# https://vaayumitra-backend.onrender.com URL (and MCP_SERVER_URL if explicit),
 # then redeploy so llm.mcp_servers is public HTTPS (required by Agora).
 # Frontend deploys separately on Vercel — see README.md Deploy section.
 services:
   - type: web
-    name: weathergpt-backend
+    name: vaayumitra-backend
     runtime: docker
     dockerfilePath: ./Dockerfile
     plan: free
@@ -21,7 +21,7 @@ services:
       - key: AGORA_APP_CERTIFICATE
         sync: false
       - key: BACKEND_URL
-        value: https://weathergpt-backend.onrender.com
+        value: https://vaayumitra-backend.onrender.com
       - key: FRONTEND_URL
         value: http://localhost:3000
       - key: USE_MOCK_IMD

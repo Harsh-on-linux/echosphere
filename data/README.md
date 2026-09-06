@@ -1,4 +1,4 @@
-# WeatherGPT Data
+# VaayuMitra Data
 
 This directory implements **Phase 1.1** folder layout per `plan.md`.
 

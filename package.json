@@ -1,7 +1,7 @@
 {
-  "name": "weathergpt",
+  "name": "vaayumitra",
   "version": "0.3.0",
-  "description": "WeatherGPT — Voice-native IMD assistant via Agora Conversational AI Engine (farmer/fisherman/disaster)",
+  "description": "VaayuMitra — Bharat's voice-native IMD-grounded मौसम intelligence via Agora Conversational AI Engine (farmer/fisherman/disaster)",
   "private": true,
   "workspaces": [
     "web"

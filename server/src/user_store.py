@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-WeatherGPT User & Vessel Profile Store — Phase 5
+VaayuMitra User & Vessel Profile Store — Phase 5
 Maintains persistent caller memory, farm records, and vessel specifications
 for personalized, context-aware voice dialogues.
 """

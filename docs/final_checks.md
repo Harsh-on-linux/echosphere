@@ -1,4 +1,4 @@
-# WeatherGPT — Final Checks (plan.md 8.3)
+# VaayuMitra — Final Checks (plan.md 8.3)
 
 ## Local results (2026-09-04, this machine)
 

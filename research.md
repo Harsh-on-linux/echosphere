@@ -1,7 +1,7 @@
-# WeatherGPT — Research Compilation
+# VaayuMitra — Research Compilation
 > Conversational AI for Weather Forecasting, Alerts, and Climate Information (SIH26068) + Agora Conversational AI Hackathon — EchoSphere
 > Generated: 2026-09-03
-> Project: WeatherGPT — voice-native, multilingual IMD data assistant for farmers, fishermen, disaster managers
+> Project: VaayuMitra — voice-native, multilingual IMD data assistant for farmers, fishermen, disaster managers
 
 ---
 
@@ -247,7 +247,7 @@ agent_id = session.start()
 - Custom LLM server implements OpenAI `tools` array; Agora forwards `tool_calls` and you return `tool` results inline.
 - Also: `POST /agents/{id}/think` to inject instructions.
 
-**WeatherGPT Tools (one per IMD endpoint):**
+**VaayuMitra Tools (one per IMD endpoint):**
 | Tool Name | IMD Endpoint | Persona |
 |-----------|--------------|---------|
 | `resolve_location` | Local fuzzy map `district_id` | All |
@@ -280,7 +280,7 @@ agent_id = session.start()
 ```
 - **SoS modes:** `vad`, `keywords` (Beta), `disabled` (legacy), `manual` (v2.9 — client signals via RTM)
 - **EoS modes:** `vad` (silence duration), `semantic` (AI understands sentence end — EN/ZH only, falls back to vad for Indic)
-- For WeatherGPT: Use `vad` for EoS + `vad` for SoS. Semantic not reliable for Indic; use `manual` only for quiz/interview mode.
+- For VaayuMitra: Use `vad` for EoS + `vad` for SoS. Semantic not reliable for Indic; use `manual` only for quiz/interview mode.
 
 **Interruption Control (v2.6 unified):**
 ```json
@@ -324,11 +324,11 @@ agent_id = session.start()
 - Requires contacting Agora support to enable PSTN — currently free Beta, pricing TBD.
 - Events: `201 inbound_call_state`, `202 outbound_call_state` webhooks.
 
-**For WeatherGPT:** Telephony-first differentiator — farmer with feature phone dials number, same agent answers. For hackathon, apply for Beta now via Console > Talk to Us, but demo fallback via Web RTC (phone bridge simulations work for judging).
+**For VaayuMitra:** Telephony-first differentiator — farmer with feature phone dials number, same agent answers. For hackathon, apply for Beta now via Console > Talk to Us, but demo fallback via Web RTC (phone bridge simulations work for judging).
 
 **Device Kit (R1):**
 - IoT path for toys/wearables/kiosks — same conversational engine with edge chip optimization.
-- Not needed for WeatherGPT web/phone, but shows scalability.
+- Not needed for VaayuMitra web/phone, but shows scalability.
 
 ---
 
@@ -419,7 +419,7 @@ agent_id = session.start()
 
 **Sample Responses:** JSON with `status, message, totalCount, data[]`. Rainfall category codes: LE/E/N/D/LD/NR/ND. Warnings per Day_1/2/3 with color codes. Cyclone with lat/lon, MSW, kt, category.
 
-**For WeatherGPT Mapping:** Each endpoint is a tool. Cache 5 mins. Attribution to IMD required.
+**For VaayuMitra Mapping:** Each endpoint is a tool. Cache 5 mins. Attribution to IMD required.
 
 ---
 

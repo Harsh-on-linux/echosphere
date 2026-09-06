@@ -123,7 +123,7 @@ sal=SalConfig(
 advanced_features={"enable_sal": True, "enable_rtm": True, "enable_tools": True},
 ```
 
-WeatherGPT keeps SAL disabled unless `SAL_ENABLED=true` and
+VaayuMitra keeps SAL disabled unless `SAL_ENABLED=true` and
 `SAL_SAMPLE_URL` is a valid HTTPS URL. `SAL_MODE` accepts `locking` or
 `recognition`; invalid configuration fails closed and uses built-in noise
 suppression only. Voiceprints must be hosted externally, consented, and kept

@@ -7,7 +7,7 @@ const env = {
   AGENT_BACKEND_URL: process.env.AGENT_BACKEND_URL || 'http://localhost:8000',
 }
 
-console.log(`[WeatherGPT Frontend] Starting Next.js (backend target: ${env.AGENT_BACKEND_URL})`)
+console.log(`[VaayuMitra Frontend] Starting Next.js (backend target: ${env.AGENT_BACKEND_URL})`)
 
 const proc = spawn('bun', ['run', 'dev'], {
   cwd: webDir,

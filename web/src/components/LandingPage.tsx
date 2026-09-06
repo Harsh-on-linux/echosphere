@@ -289,7 +289,10 @@ export default function LandingPage() {
 	};
 
 	return (
-		<div className="relative flex h-dvh min-h-screen flex-col overflow-hidden bg-background text-foreground">
+		<div className="vm-monsoon-bg relative flex h-dvh min-h-screen flex-col overflow-hidden text-foreground">
+			<div className="vm-grid-overlay pointer-events-none absolute inset-0" aria-hidden />
+			<div className="vm-drift pointer-events-none absolute -top-24 left-[8%] h-72 w-72 rounded-full bg-primary/15 blur-3xl" aria-hidden />
+			<div className="pointer-events-none absolute right-[4%] top-[30%] h-80 w-80 rounded-full bg-accent/10 blur-3xl" aria-hidden />
 			<div
 				className={`flex min-h-0 flex-1 flex-col ${
 					showConversation

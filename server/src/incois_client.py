@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-WeatherGPT INCOIS Marine Client — Phase 2.1
+VaayuMitra INCOIS Marine Client — Phase 2.1
 Integrates Indian National Centre for Ocean Information Services (INCOIS) data:
 - Ocean State Forecast (OSF): Wave height, swell, currents, sea condition.
 - High Wave & Swell Surge Alerts: Safety warnings for motorized and traditional craft.

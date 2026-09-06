@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-WeatherGPT Emergency Handler — Phase 3 (Safety Guardrails & SOS Lifeline)
+VaayuMitra Emergency Handler — Phase 3 (Safety Guardrails & SOS Lifeline)
 Provides zero-hallucination deterministic quoting for Red Alerts and
 real-time maritime SOS distress triage for coastal fishermen and disaster emergencies.
 """
