@@ -308,18 +308,24 @@ export default function LandingPage() {
 					}`}
 				>
 					{!showConversation ? (
-						<div className="flex flex-col items-center gap-4">
-							<QuickstartPreCallCard
-								isLoading={isLoading}
-								error={error}
-								onStartConversation={handleStartConversation}
-								coords={coords}
-								onToggleLocation={handleToggleLocation}
-								isLocating={isLocating}
-							/>
-							<VoiceSettingsPanel onChange={setVoiceSettings} />
-							<SessionHistoryPanel />
-							<TelephonyPanel />
+						<div className="z-10 min-h-0 w-full flex-1 overflow-y-auto">
+							<div className="mx-auto grid w-[min(94vw,62rem)] gap-4 px-1 pb-32 pt-6 sm:pt-10 lg:grid-cols-2 lg:items-start">
+								<div className="flex min-w-0 flex-col items-stretch gap-4">
+									<QuickstartPreCallCard
+										isLoading={isLoading}
+										error={error}
+										onStartConversation={handleStartConversation}
+										coords={coords}
+										onToggleLocation={handleToggleLocation}
+										isLocating={isLocating}
+									/>
+									<VoiceSettingsPanel onChange={setVoiceSettings} />
+								</div>
+								<div className="flex min-w-0 flex-col items-stretch gap-4">
+									<SessionHistoryPanel />
+									<TelephonyPanel />
+								</div>
+							</div>
 						</div>
 					) : agoraData && rtmClient ? (
 						<>

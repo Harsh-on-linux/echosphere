@@ -24,7 +24,7 @@ export function QuickstartPreCallCard({
 }: QuickstartPreCallCardProps) {
 	return (
 		<div
-			className="relative mx-auto flex w-[min(94vw,30rem)] animate-fade-up flex-col items-center overflow-hidden rounded-3xl border border-border px-8 py-9 text-center shadow-[0_24px_70px_rgba(0,0,0,0.5)]"
+			className="relative flex w-full animate-fade-up flex-col items-center overflow-hidden rounded-3xl border border-border px-6 py-8 text-center shadow-[0_24px_70px_rgba(0,0,0,0.5)] sm:px-8"
 			style={{
 				background:
 					"linear-gradient(165deg, hsl(172 66% 50% / 0.12), transparent 42%), linear-gradient(210deg, hsl(38 92% 60% / 0.1), transparent 46%), linear-gradient(180deg, hsl(var(--surface-elevated)), hsl(var(--surface)))",
@@ -32,9 +32,8 @@ export function QuickstartPreCallCard({
 		>
 			<div className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-primary/20 blur-3xl" />
 			<div className="pointer-events-none absolute -bottom-12 -left-10 h-40 w-40 rounded-full bg-accent/15 blur-3xl" />
-			<div className="relative">
+			<div className="relative" style={{ filter: "drop-shadow(0 0 22px hsl(172 66% 50% / 0.35))" }}>
 				<VaayuMitraMark size={56} />
-				<span className="vm-pulse-ring absolute inset-0 rounded-2xl border border-primary/50" aria-hidden />
 			</div>
 			<p className="mt-4 text-[11px] font-semibold uppercase tracking-[0.22em] text-primary">
 				वायुमित्र · IMD-grounded

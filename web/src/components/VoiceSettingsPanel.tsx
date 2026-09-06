@@ -82,13 +82,13 @@ export function VoiceSettingsPanel({
   }, [settings, onChange]);
 
   return (
-    <fieldset
-      className="mx-auto flex w-[min(92vw,26.25rem)] flex-col gap-3 rounded-[20px] border border-border bg-card/20 px-5 py-4 text-left"
+    <section
+      className="flex w-full flex-col gap-3 rounded-3xl border border-border bg-card/20 px-5 py-4 text-left"
       aria-label="Voice settings"
     >
-      <legend className="px-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+      <h2 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
         Voice settings
-      </legend>
+      </h2>
       <label className="flex flex-col gap-1 text-xs font-medium text-muted-foreground">
         ASR language
         <select
@@ -150,6 +150,6 @@ export function VoiceSettingsPanel({
         Indic languages use Sarvam BYOK when the server has a key, else the
         managed English loop. Persona tunes the prompt and speech rate.
       </p>
-    </fieldset>
+    </section>
   );
 }

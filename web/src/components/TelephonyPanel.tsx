@@ -68,7 +68,7 @@ export function TelephonyPanel() {
 
   return (
     <section
-      className="w-full max-w-xl rounded-2xl border border-border bg-card/20 px-4 py-3 text-left"
+      className="w-full rounded-2xl border border-border bg-card/20 px-4 py-3 text-left"
       aria-label="Phone call access"
     >
       <div className="flex items-center justify-between gap-2">

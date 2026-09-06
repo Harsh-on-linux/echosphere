@@ -203,13 +203,3 @@ body {
 .vm-drift {
 	animation: vm-drift 14s ease-in-out infinite;
 }
-
-@keyframes vm-pulse-ring {
-	0% { transform: scale(0.9); opacity: 0.55; }
-	70% { transform: scale(1.25); opacity: 0; }
-	100% { transform: scale(1.25); opacity: 0; }
-}
-
-.vm-pulse-ring {
-	animation: vm-pulse-ring 2.6s cubic-bezier(0.2, 0.6, 0.3, 1) infinite;
-}

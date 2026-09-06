@@ -54,7 +54,7 @@ export function SessionHistoryPanel() {
   if (snapshots.length === 0) {
     return (
       <section
-        className="w-full max-w-xl rounded-2xl border border-border bg-card/20 px-4 py-3 text-left"
+        className="w-full rounded-2xl border border-border bg-card/20 px-4 py-3 text-left"
         aria-label="Past voice sessions"
       >
         <h2 className="text-sm font-semibold text-foreground">Past Sessions</h2>
@@ -68,10 +68,10 @@ export function SessionHistoryPanel() {
 
   return (
     <section
-      className="w-full max-w-xl rounded-2xl border border-border bg-card/20 px-4 py-3 text-left"
-      aria-label="Past voice sessions"
-    >
-      <div className="flex items-center justify-between gap-2">
+      className="w-full rounded-2xl border border-border bg-card/20 px-4 py-3 text-left"
+        aria-label="Past voice sessions"
+      >
+        <div className="flex items-center justify-between gap-2">
         <h2 className="text-sm font-semibold text-foreground">
           Past Sessions ({snapshots.length})
         </h2>
